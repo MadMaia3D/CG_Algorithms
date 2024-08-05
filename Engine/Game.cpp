@@ -26,13 +26,15 @@ Game::Game(MainWindow& wnd)
 	wnd(wnd),
 	gfx(wnd) {
 	track.push_back({ 50.0f, 0.0f });
-	track.push_back({ 150.0f, 0.0f });
+	track.push_back({ 250.0f, 0.0f });
+	track.push_back({ 150.0f, 1.0f });
+	track.push_back({ 250.0f, 0.0f });
+	track.push_back({ 150.0f, -1.0f });
+	track.push_back({ 50.0f, 0.0f });
 	track.push_back({ 100.0f, 1.0f });
-	track.push_back({ 150.0f, 0.0f });
-	track.push_back({ 100.0f, -0.5f });
-	track.push_back({ 100.0f, 0.5f });
-	track.push_back({ 150.0f, 0.0f });
+	track.push_back({ 200.0f, 0.0f });
 	track.push_back({ 100.0f, -1.0f });
+	track.push_back({ 100.0f, 0.0f });
 	track.push_back({ 100.0f, 0.0f });
 }
 
@@ -48,23 +50,25 @@ void Game::UpdateModel() {
 	if (wnd.kbd.KeyIsPressed('W')) {
 		carSpeed = Lerp(carSpeed, maxCarSpeed, deltaTime);
 	} else {
-		carSpeed = Lerp(carSpeed, 0, deltaTime/2);
+		carSpeed = Lerp(carSpeed, 0, deltaTime / 2);
 	}
 	distance += carSpeed * deltaTime;
 
 	offset = 0.0f;
 	trackSection = 0;
 
-	while (trackSection < track.size() && offset <= distance) {
+	while ((size_t)trackSection < track.size() && offset <= distance) {
 		offset += track[trackSection].distance;
 		trackSection++;
 	}
-	if (trackSection >= track.size()) { distance = 0.0f; }
-
-	if (wnd.kbd.KeyIsPressed('W') || wnd.kbd.KeyIsPressed('S')) {
-		targetCurvature = track[trackSection - 1].curvature;
-		curvature = Lerp(curvature, targetCurvature, deltaTime);
+	if ((size_t)trackSection >= track.size()) {
+		distance = 0.0f;
 	}
+
+	const float normalizedSpeed = carSpeed / maxCarSpeed;
+
+	targetCurvature = track[trackSection - 1].curvature;
+	curvature = Lerp(curvature, targetCurvature, deltaTime);
 }
 
 void Game::ComposeFrame() {
@@ -72,23 +76,23 @@ void Game::ComposeFrame() {
 	constexpr int windowHeight = Graphics::ScreenHeight;
 	for (int y = 0; y < windowHeight / 2; y++) {
 
-			const float perspective = (float)y / (windowHeight / 2.0f);
+		const float perspective = (float)y / (windowHeight / 2.0f);
 
-			const float middlePoint = 0.5f + curvature * powf(1.0f - perspective, 5);
-			const float roadWidth = 0.05f + perspective * 0.8f;
-			const float curbsWidth = roadWidth * 0.15f;
-			const float halfRoad = roadWidth / 2;
+		const float middlePoint = 0.5f + curvature * powf(1.0f - perspective, 5);
+		const float roadWidth = 0.05f + perspective * 0.8f;
+		const float curbsWidth = roadWidth * 0.15f;
+		const float halfRoad = roadWidth / 2;
 
-			const int leftCurb = int ((middlePoint - halfRoad - curbsWidth) * windowWidth);
-			const int leftRoad = int ((middlePoint - halfRoad) * windowWidth);
-			const int rightRoad = int ((middlePoint + halfRoad) * windowWidth);
-			const int rightCurb = int ((middlePoint + halfRoad + curbsWidth) * windowWidth);
+		const int leftCurb = int((middlePoint - halfRoad - curbsWidth) * windowWidth);
+		const int leftRoad = int((middlePoint - halfRoad) * windowWidth);
+		const int rightRoad = int((middlePoint + halfRoad) * windowWidth);
+		const int rightCurb = int((middlePoint + halfRoad + curbsWidth) * windowWidth);
 
-			const bool isDarkGrass = sin(4.0f * powf(1.5f - perspective, 5) + distance * 0.4) >= 0;
-			const bool isDarkCurb = sin(25.0f * powf(1.5f - perspective, 5) + distance) >= 0;
-			const Color grassColor = isDarkGrass ? Color(32, 128, 0) : Color(64, 196, 0);
-			const Color curbsColor = isDarkCurb ? Color(200, 32, 32) : Color(225, 225, 225);
-			const Color roadColor = Color(150, 150, 128);
+		const bool isDarkGrass = sin(4.0f * powf(1.5f - perspective, 5) + distance * 0.4) >= 0;
+		const bool isDarkCurb = sin(25.0f * powf(1.5f - perspective, 5) + distance) >= 0;
+		const Color grassColor = isDarkGrass ? Color(32, 128, 0) : Color(64, 196, 0);
+		const Color curbsColor = isDarkCurb ? Color(200, 32, 32) : Color(225, 225, 225);
+		const Color roadColor = Color(150, 150, 128);
 
 		for (int x = 0; x < windowWidth; x++) {
 			const int nRow = y + windowHeight / 2;
@@ -99,8 +103,6 @@ void Game::ComposeFrame() {
 			} else {
 				gfx.PutPixel(x, nRow, roadColor);
 			}
-
-
 		}
 	}
 }
