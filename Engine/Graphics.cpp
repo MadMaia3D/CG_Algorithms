@@ -328,6 +328,10 @@ void Graphics::DrawRect(int x, int y, int width, int height, Color c) {
 	}
 }
 
+void Graphics::DrawRectCenter(int center_x, int center_y, int width, int height, Color c) {
+	DrawRect(center_x - width / 2, center_y - height / 2, width, height, c);
+}
+
 
 //////////////////////////////////////////////////
 //           Graphics Exception
