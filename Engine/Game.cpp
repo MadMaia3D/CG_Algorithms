@@ -1,5 +1,5 @@
-/****************************************************************************************** 
- *	Chili DirectX Framework Version 16.07.20											  *	
+/******************************************************************************************
+ *	Chili DirectX Framework Version 16.07.20											  *
  *	Game.cpp																			  *
  *	Copyright 2016 PlanetChili.net <http://www.planetchili.net>							  *
  *																						  *
@@ -21,25 +21,64 @@
 #include "MainWindow.h"
 #include "Game.h"
 
-Game::Game( MainWindow& wnd )
+Game::Game(MainWindow& wnd)
 	:
-	wnd( wnd ),
-	gfx( wnd )
-{
+	wnd(wnd),
+	gfx(wnd) {
 }
 
-void Game::Go()
-{
-	gfx.BeginFrame();	
+void Game::Go() {
+	gfx.BeginFrame();
 	UpdateModel();
 	ComposeFrame();
 	gfx.EndFrame();
 }
 
-void Game::UpdateModel()
-{
+void Game::UpdateModel() {
+	const float deltaTime = frameTimer.Mark();
+	const float speed = 25.0f;
+	if (wnd.kbd.KeyIsPressed('W')) {
+		distance += speed * deltaTime;
+	}
+	if (wnd.kbd.KeyIsPressed('S')) {
+		distance -= speed * deltaTime;
+	}
 }
 
-void Game::ComposeFrame()
-{
+void Game::ComposeFrame() {
+	constexpr int windowWidth = Graphics::ScreenWidth;
+	constexpr int windowHeight = Graphics::ScreenHeight;
+	for (int y = 0; y < windowHeight / 2; y++) {
+
+			const float perspective = (float)y / (windowHeight / 2.0f);
+
+			const float middlePoint = 0.5f;
+			const float roadWidth = 0.05f + perspective * 0.8f;
+			const float curbsWidth = roadWidth * 0.1f;
+			const float halfRoad = roadWidth / 2;
+
+			const int leftCurb = int ((middlePoint - halfRoad - curbsWidth) * windowWidth);
+			const int leftRoad = int ((middlePoint - halfRoad) * windowWidth);
+			const int rightRoad = int ((middlePoint + halfRoad) * windowWidth);
+			const int rightCurb = int ((middlePoint + halfRoad + curbsWidth) * windowWidth);
+
+			const bool isDarkGrass = sin(5.0f * powf(1.5f - perspective, 5) + distance) >= 0;
+			const bool isDarkCurb = sin(30.0f * powf(1.5f - perspective, 3) + distance * 3.5f) >= 0;
+			const Color grassColor = isDarkGrass ? Color(32, 128, 0) : Color(64, 196, 0);
+			const Color curbsColor = isDarkCurb ? Color(200, 32, 32) : Color(200, 200, 200);
+			const Color roadColor = Color(112, 112, 112);
+
+		for (int x = 0; x < windowWidth; x++) {
+			const int nRow = y + windowHeight / 2;
+			if (x < leftCurb || x > rightCurb) {
+				gfx.PutPixel(x, nRow, grassColor);
+			} else if (x < leftRoad || x > rightRoad) {
+				gfx.PutPixel(x, nRow, curbsColor);
+			} else {
+				gfx.PutPixel(x, nRow, roadColor);
+			}
+
+
+		}
+	}
 }
