@@ -25,7 +25,7 @@ Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
 	gfx(wnd) {
-	track.push_back({ 50.0f, 0.0f });
+	track.push_back({ 100.0f, 0.0f });
 	track.push_back({ 250.0f, 0.0f });
 	track.push_back({ 150.0f, 1.0f });
 	track.push_back({ 250.0f, 0.0f });
@@ -34,8 +34,7 @@ Game::Game(MainWindow& wnd)
 	track.push_back({ 100.0f, 1.0f });
 	track.push_back({ 200.0f, 0.0f });
 	track.push_back({ 100.0f, -1.0f });
-	track.push_back({ 100.0f, 0.0f });
-	track.push_back({ 100.0f, 0.0f });
+	track.push_back({ 200.0f, 0.0f });
 
 	trackLength = 0.0f;
 	for (const auto &seg : track) {
@@ -77,19 +76,19 @@ void Game::UpdateModel() {
 	} else if ((accumCarCurvature - accumTrackCurvature) > trackLimits) {
 		accumCarCurvature = accumTrackCurvature + trackLimits;
 	}
-	distance += carSpeed * deltaTime;
+	traveledDistance += carSpeed * deltaTime;
 
 	// find track point
 	offset = 0.0f;
 	trackSection = 0;
 
-	while ((size_t)trackSection < track.size() && offset <= distance) {
+	while ((size_t)trackSection < track.size() && offset <= traveledDistance) {
 		offset += track[trackSection].length;
 		trackSection++;
 	}
 	// reset track lap
-	if (distance >= trackLength) {
-		distance -= trackLength;
+	if (traveledDistance >= trackLength) {
+		traveledDistance -= trackLength;
 	}
 	
 	// track curvature calculations
@@ -116,13 +115,30 @@ void Game::ComposeFrame() {
 		const int rightRoad = int((middlePoint + halfRoad) * windowWidth);
 		const int rightCurb = int((middlePoint + halfRoad + curbsWidth) * windowWidth);
 
-		const bool isDarkGrass = sin(4.0f * powf(1.5f - perspective, 5) + distance * 0.4) >= 0;
-		const bool isDarkCurb = sin(25.0f * powf(1.5f - perspective, 5) + distance) >= 0;
+		const bool isDarkGrass = sin(4.0f * powf(1.5f - perspective, 5) + traveledDistance * 0.4) >= 0;
+		const bool isDarkCurb = sin(25.0f * powf(1.5f - perspective, 5) + traveledDistance) >= 0;
 		const Color grassColor = isDarkGrass ? Color(32, 128, 0) : Color(64, 196, 0);
 		const Color curbsColor = isDarkCurb ? Color(200, 32, 32) : Color(225, 225, 225);
-		const Color roadColor = Color(150, 150, 128);
+
+		Color roadColor = Color(150, 150, 128);
+
+		const bool isAtStart = traveledDistance < track[0].length;
+		// calculate horizontal stripes
+		bool checkerA = false;
+		if (isAtStart) {
+			checkerA = sin(30.0f * powf(1.5f - perspective, 5) + traveledDistance) >= 0;
+		} 
 
 		for (int x = 0; x < windowWidth; x++) {
+
+			if (isAtStart) {
+				// calculate vertical stripes and checker pattern
+				float c = (float(x) - 450) / perspective / 20.0f;
+				const bool checkerB = sin(c) > 0 ? true : false;
+				roadColor = checkerA ^ checkerB ? Color(0, 0, 0) : Color(255, 255, 255);
+			}
+
+			// draw road
 			const int nRow = y + windowHeight / 2;
 			if (x < leftCurb || x > rightCurb) {
 				gfx.PutPixel(x, nRow, grassColor);
@@ -133,6 +149,7 @@ void Game::ComposeFrame() {
 			}
 		}
 
+		// draw car
 		float carPosition = (accumCarCurvature - accumTrackCurvature) * 400.0f ;
 		gfx.DrawRectCenter((int)carPosition + 450, 500, 100, 50, Colors::Black);
 	}

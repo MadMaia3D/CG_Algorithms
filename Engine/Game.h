@@ -49,7 +49,7 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
-	float distance = 0.0f;
+	float traveledDistance = 0.0f;
 	FrameTimer frameTimer;
 	std::vector<TrackSegment> track;
 	float offset = 0.0f;
