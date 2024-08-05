@@ -31,9 +31,9 @@ Game::Game(MainWindow& wnd)
 	track.push_back({ 250.0f, 0.0f });
 	track.push_back({ 150.0f, -1.0f });
 	track.push_back({ 50.0f, 0.0f });
-	track.push_back({ 100.0f, 1.0f });
+	track.push_back({ 150.0f, 1.0f });
 	track.push_back({ 200.0f, 0.0f });
-	track.push_back({ 100.0f, -1.0f });
+	track.push_back({ 150.0f, -1.0f });
 	track.push_back({ 200.0f, 0.0f });
 
 	trackLength = 0.0f;
@@ -157,7 +157,7 @@ void Game::ComposeFrame() {
 			const float skyMix = y / (float)windowHeight * 2;
 			Color finalSkyColor = Lerp(skyColor_1, skyColor_2, skyMix);
 			// calculate mountains height
-			const float mountainHeight = (abs(sin( (x + 650) / 350.0f) + accumCarCurvature/5) + 2.15f) * 128;
+			const float mountainHeight = (abs(sin(x/500.0f + 2.25f + accumCarCurvature)) + 2.15f) * 128;
 
 			Color finalBackgroundColor = mountainHeight > (windowHeight - y) ? mountainsColor : finalSkyColor;
 			gfx.PutPixel(x,y, finalBackgroundColor);
