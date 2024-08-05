@@ -36,6 +36,11 @@ Game::Game(MainWindow& wnd)
 	track.push_back({ 100.0f, -1.0f });
 	track.push_back({ 100.0f, 0.0f });
 	track.push_back({ 100.0f, 0.0f });
+
+	trackLength = 0.0f;
+	for (const auto &seg : track) {
+		trackLength += seg.length;
+	}
 }
 
 void Game::Go() {
@@ -47,28 +52,51 @@ void Game::Go() {
 
 void Game::UpdateModel() {
 	const float deltaTime = frameTimer.Mark();
+
+	// acceleration controls
 	if (wnd.kbd.KeyIsPressed('W')) {
 		carSpeed = Lerp(carSpeed, maxCarSpeed, deltaTime);
 	} else {
 		carSpeed = Lerp(carSpeed, 0, deltaTime / 2);
 	}
+	// steering controls
+	constexpr float carSteeringSpeed = 1.25f;
+	if (wnd.kbd.KeyIsPressed('A')) {
+		accumCarCurvature -= carSteeringSpeed * deltaTime;
+	}
+	if (wnd.kbd.KeyIsPressed('D')) {
+		accumCarCurvature += carSteeringSpeed * deltaTime;
+	}
+	// forced braking
+	if (abs(accumCarCurvature - accumTrackCurvature) > 0.7f) {
+		carSpeed = Lerp(carSpeed, 0, deltaTime * 5.0f);
+	}
+	constexpr float trackLimits = 0.85f;
+	if ((accumCarCurvature - accumTrackCurvature) < -trackLimits) {
+		accumCarCurvature = accumTrackCurvature - trackLimits;
+	} else if ((accumCarCurvature - accumTrackCurvature) > trackLimits) {
+		accumCarCurvature = accumTrackCurvature + trackLimits;
+	}
 	distance += carSpeed * deltaTime;
 
+	// find track point
 	offset = 0.0f;
 	trackSection = 0;
 
 	while ((size_t)trackSection < track.size() && offset <= distance) {
-		offset += track[trackSection].distance;
+		offset += track[trackSection].length;
 		trackSection++;
 	}
-	if ((size_t)trackSection >= track.size()) {
-		distance = 0.0f;
+	// reset track lap
+	if (distance >= trackLength) {
+		distance -= trackLength;
 	}
-
-	const float normalizedSpeed = carSpeed / maxCarSpeed;
-
+	
+	// track curvature calculations
 	targetCurvature = track[trackSection - 1].curvature;
 	curvature = Lerp(curvature, targetCurvature, deltaTime);
+	const float normalizedCarSpeed = carSpeed / maxCarSpeed;
+	accumTrackCurvature += curvature * deltaTime * normalizedCarSpeed * 2.0f;
 }
 
 void Game::ComposeFrame() {
@@ -79,7 +107,7 @@ void Game::ComposeFrame() {
 		const float perspective = (float)y / (windowHeight / 2.0f);
 
 		const float middlePoint = 0.5f + curvature * powf(1.0f - perspective, 5);
-		const float roadWidth = 0.05f + perspective * 0.8f;
+		const float roadWidth = 0.05f + 0.8f * perspective;
 		const float curbsWidth = roadWidth * 0.15f;
 		const float halfRoad = roadWidth / 2;
 
@@ -104,5 +132,8 @@ void Game::ComposeFrame() {
 				gfx.PutPixel(x, nRow, roadColor);
 			}
 		}
+
+		float carPosition = (accumCarCurvature - accumTrackCurvature) * 400.0f ;
+		gfx.DrawRectCenter((int)carPosition + 450, 500, 100, 50, Colors::Black);
 	}
 }

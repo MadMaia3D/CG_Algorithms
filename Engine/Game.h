@@ -29,7 +29,7 @@
 class Game {
 private:
 	struct TrackSegment {
-		float distance;
+		float length;
 		float curvature;
 	};
 public:
@@ -56,7 +56,10 @@ private:
 	int trackSection = 0;
 	float curvature = 0.0f;
 	float targetCurvature = 0.0f;
+	float trackLength = 0.0f;
 	float carSpeed = 0.0f;
-	const float maxCarSpeed = 65.0f;
+	const float maxCarSpeed = 75.0f;
+	float accumTrackCurvature = 0.0f;
+	float accumCarCurvature = 0.0f;
 	/********************************/
 };
