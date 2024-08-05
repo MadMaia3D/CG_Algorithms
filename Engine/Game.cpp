@@ -95,7 +95,7 @@ void Game::UpdateModel() {
 	targetCurvature = track[trackSection - 1].curvature;
 	curvature = Lerp(curvature, targetCurvature, deltaTime);
 	const float normalizedCarSpeed = carSpeed / maxCarSpeed;
-	accumTrackCurvature += curvature * deltaTime * normalizedCarSpeed * 2.0f;
+	accumTrackCurvature += curvature * deltaTime * normalizedCarSpeed * 2.5f;
 }
 
 void Game::ComposeFrame() {
