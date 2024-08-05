@@ -1,5 +1,5 @@
-/****************************************************************************************** 
- *	Chili DirectX Framework Version 16.07.20											  *	
+/******************************************************************************************
+ *	Chili DirectX Framework Version 16.07.20											  *
  *	Game.h																				  *
  *	Copyright 2016 PlanetChili.net <http://www.planetchili.net>							  *
  *																						  *
@@ -24,19 +24,25 @@
 #include "Mouse.h"
 #include "Graphics.h"
 #include "FrameTimer.h"
+#include <vector>
 
-class Game
-{
+class Game {
+private:
+	struct TrackSegment {
+		float distance;
+		float curvature;
+	};
 public:
-	Game( class MainWindow& wnd );
-	Game( const Game& ) = delete;
-	Game& operator=( const Game& ) = delete;
+	Game(class MainWindow& wnd);
+	Game(const Game&) = delete;
+	Game& operator=(const Game&) = delete;
 	void Go();
 private:
 	void ComposeFrame();
 	void UpdateModel();
 	/********************************/
 	/*  User Functions              */
+	float Lerp(float a, float b, float t) { return a + (b - a)*t; }
 	/********************************/
 private:
 	MainWindow& wnd;
@@ -45,5 +51,12 @@ private:
 	/*  User Variables              */
 	float distance = 0.0f;
 	FrameTimer frameTimer;
+	std::vector<TrackSegment> track;
+	float offset = 0.0f;
+	int trackSection = 0;
+	float curvature = 0.0f;
+	float targetCurvature = 0.0f;
+	float carSpeed = 0.0f;
+	const float maxCarSpeed = 65.0f;
 	/********************************/
 };
