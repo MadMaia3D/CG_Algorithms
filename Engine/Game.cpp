@@ -101,6 +101,7 @@ void Game::UpdateModel() {
 void Game::ComposeFrame() {
 	constexpr int windowWidth = Graphics::ScreenWidth;
 	constexpr int windowHeight = Graphics::ScreenHeight;
+
 	for (int y = 0; y < windowHeight / 2; y++) {
 
 		const float perspective = (float)y / (windowHeight / 2.0f);
@@ -117,7 +118,7 @@ void Game::ComposeFrame() {
 
 		const bool isDarkGrass = sin(4.0f * powf(1.5f - perspective, 5) + traveledDistance * 0.4) >= 0;
 		const bool isDarkCurb = sin(25.0f * powf(1.5f - perspective, 5) + traveledDistance) >= 0;
-		const Color grassColor = isDarkGrass ? Color(32, 128, 0) : Color(64, 196, 0);
+		const Color grassColor = isDarkGrass ? Color(80, 128, 0) : Color(128, 196, 0);
 		const Color curbsColor = isDarkCurb ? Color(200, 32, 32) : Color(225, 225, 225);
 
 		Color roadColor = Color(150, 150, 128);
@@ -135,7 +136,7 @@ void Game::ComposeFrame() {
 				// calculate vertical stripes and checker pattern
 				float c = (float(x) - 450) / perspective / 20.0f;
 				const bool checkerB = sin(c) > 0 ? true : false;
-				roadColor = checkerA ^ checkerB ? Color(0, 0, 0) : Color(255, 255, 255);
+				roadColor = checkerA ^ checkerB ? Color(100, 100, 80) : Color(200, 200, 180);
 			}
 
 			// draw road
@@ -147,10 +148,14 @@ void Game::ComposeFrame() {
 			} else {
 				gfx.PutPixel(x, nRow, roadColor);
 			}
+
+			Color skyColor = { 40,128,200 };
+			gfx.PutPixel(x, y, skyColor);
 		}
 
 		// draw car
-		float carPosition = (accumCarCurvature - accumTrackCurvature) * 400.0f ;
-		gfx.DrawRectCenter((int)carPosition + 450, 500, 100, 50, Colors::Black);
+		const float carPosition = (accumCarCurvature - accumTrackCurvature) * 400.0f ;
+		constexpr Color carColor = {225,70,32};
+		gfx.DrawRectCenter((int)carPosition + 450, 500, 100, 50, carColor);
 	}
 }
