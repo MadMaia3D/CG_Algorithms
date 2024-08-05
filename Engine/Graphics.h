@@ -24,14 +24,13 @@
 #include <wrl.h>
 #include "ChiliException.h"
 #include "Colors.h"
+#include <algorithm>
 
-class Graphics
-{
+class Graphics {
 public:
-	class Exception : public ChiliException
-	{
+	class Exception : public ChiliException {
 	public:
-		Exception( HRESULT hr,const std::wstring& note,const wchar_t* file,unsigned int line );
+		Exception(HRESULT hr, const std::wstring& note, const wchar_t* file, unsigned int line);
 		std::wstring GetErrorName() const;
 		std::wstring GetErrorDescription() const;
 		virtual std::wstring GetFullMessage() const override;
@@ -41,22 +40,21 @@ public:
 	};
 private:
 	// vertex format for the framebuffer fullscreen textured quad
-	struct FSQVertex
-	{
-		float x,y,z;		// position
-		float u,v;			// texcoords
+	struct FSQVertex {
+		float x, y, z;		// position
+		float u, v;			// texcoords
 	};
 public:
-	Graphics( class HWNDKey& key );
-	Graphics( const Graphics& ) = delete;
-	Graphics& operator=( const Graphics& ) = delete;
+	Graphics(class HWNDKey& key);
+	Graphics(const Graphics&) = delete;
+	Graphics& operator=(const Graphics&) = delete;
 	void EndFrame();
 	void BeginFrame();
-	void PutPixel( int x,int y,int r,int g,int b )
-	{
-		PutPixel( x,y,{ unsigned char( r ),unsigned char( g ),unsigned char( b ) } );
+	void PutPixel(int x, int y, int r, int g, int b) {
+		PutPixel(x, y, { unsigned char(r),unsigned char(g),unsigned char(b) });
 	}
-	void PutPixel( int x,int y,Color c );
+	void PutPixel(int x, int y, Color c);
+	void DrawRect(int x, int y, int width, int height, Color c);
 	~Graphics();
 private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain>				pSwapChain;
