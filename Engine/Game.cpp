@@ -149,8 +149,18 @@ void Game::ComposeFrame() {
 				gfx.PutPixel(x, nRow, roadColor);
 			}
 
-			Color skyColor = { 40,128,200 };
-			gfx.PutPixel(x, y, skyColor);
+			// colors
+			Color skyColor_1(40, 128, 200);
+			Color skyColor_2(200, 128, 150);
+			Color mountainsColor(96, 45, 32);
+			// calculate sky gradient
+			const float skyMix = y / (float)windowHeight * 2;
+			Color finalSkyColor = Lerp(skyColor_1, skyColor_2, skyMix);
+			// calculate mountains height
+			const float mountainHeight = (abs(sin( (x + 650) / 350.0f) + accumCarCurvature/5) + 2.15f) * 128;
+
+			Color finalBackgroundColor = mountainHeight > (windowHeight - y) ? mountainsColor : finalSkyColor;
+			gfx.PutPixel(x,y, finalBackgroundColor);
 		}
 
 		// draw car
@@ -158,4 +168,17 @@ void Game::ComposeFrame() {
 		constexpr Color carColor = {225,70,32};
 		gfx.DrawRectCenter((int)carPosition + 450, 500, 100, 50, carColor);
 	}
+}
+
+
+float Game::Lerp(float a, float b, float t) const {
+	return a + (b - a)*t;
+}
+
+Color Game::Lerp(Color a, Color b, float t) const {
+	float red = Lerp(a.GetR(), b.GetR(), t);
+	float green = Lerp(a.GetG(), b.GetG(), t);
+	float blue = Lerp(a.GetB(), b.GetB(), t);
+
+	return Color((int)red, (int)green, (int)blue);
 }

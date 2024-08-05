@@ -42,7 +42,8 @@ private:
 	void UpdateModel();
 	/********************************/
 	/*  User Functions              */
-	float Lerp(float a, float b, float t) { return a + (b - a)*t; }
+	float Lerp(float a, float b, float t) const;
+	Color Lerp(Color a, Color b, float t) const;
 	/********************************/
 private:
 	MainWindow& wnd;
