@@ -316,6 +316,93 @@ void Graphics::PutPixel( int x,int y,Color c )
 	pSysBuffer[Graphics::ScreenWidth * y + x] = c;
 }
 
+void Graphics::DrawLine(const Vec2 & p1, const Vec2 & p2, Color c) {
+	DrawLine(p1.x, p1.y, p2.x, p2.y, c);
+}
+
+void Graphics::DrawLine(float x1, float y1, float x2, float y2, Color c) {
+	const float dx = x2 - x1;
+	const float dy = y2 - y1;
+
+	if (dy == 0.0f && dx == 0.0f) {
+		PutPixel(int(x1), int(y1), c);
+	} else if (abs(dy) > abs(dx)) {
+		if (dy < 0.0f) {
+			std::swap(x1, x2);
+			std::swap(y1, y2);
+		}
+
+		const float m = dx / dy;
+		float y = y1;
+		int lastIntY;
+		for (float x = x1; y < y2; y += 1.0f, x += m) {
+			lastIntY = int(y);
+			PutPixel(int(x), lastIntY, c);
+		}
+		if (int(y2) > lastIntY) {
+			PutPixel(int(x2), int(y2), c);
+		}
+	} else {
+		if (dx < 0.0f) {
+			std::swap(x1, x2);
+			std::swap(y1, y2);
+		}
+
+		const float m = dy / dx;
+		float x = x1;
+		int lastIntX;
+		for (float y = y1; x < x2; x += 1.0f, y += m) {
+			lastIntX = int(x);
+			PutPixel(lastIntX, int(y), c);
+		}
+		if (int(x2) > lastIntX) {
+			PutPixel(int(x2), int(y2), c);
+		}
+	}
+}
+
+void Graphics::DrawLineClamped(Vec2 p1, Vec2 p2, Color c) {
+	// Setup X
+	if (p1.x > p2.x) {
+		std::swap(p1, p2);
+	}
+	if (p1.x >= ScreenWidth) { return; }
+	if (p2.x < 0) { return; }
+
+	// Clamp Left
+	if (p1.x < 0) {
+		const float deltaX = p2.x - p1.x;
+		const float cutPercentage = -p1.x / deltaX;
+		p1 = Interpolate(p1, p2, cutPercentage);
+	}
+	// Clamp Right
+	if (p2.x >= ScreenWidth) {
+		const float deltaX = p2.x - p1.x;
+		const float cutPercentage = (ScreenWidth - 1 - p1.x) / deltaX;
+		p2 = Interpolate(p1, p2, cutPercentage);
+	}
+	// Setup Y
+	if (p1.y > p2.y) {
+		std::swap(p1, p2);
+	}
+	if (p1.y >= ScreenHeight) { return; }
+	if (p2.y < 0) { return; }
+
+	// Clamp Top
+	if (p1.y < 0) {
+		const float deltaY = p2.y - p1.y;
+		const float cutPercentage = -p1.y / deltaY;
+		p1 = Interpolate(p1, p2, cutPercentage);
+	}
+	// Clamp Bottom
+	if (p2.y >= ScreenHeight) {
+		const float deltaY = p2.y - p1.y;
+		const float cutPercentage = (ScreenHeight - 1 - p1.y) / deltaY;
+		p2 = Interpolate(p1, p2, cutPercentage);
+	}
+
+	DrawLine(p1.x, p1.y, p2.x, p2.y, c);
+}
 
 //////////////////////////////////////////////////
 //           Graphics Exception

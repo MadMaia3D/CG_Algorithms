@@ -42,4 +42,24 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
+	constexpr int rows = 8;
+	constexpr int columns = 15;
+	constexpr int cellWidth = 30;
+	constexpr int cellHeight = 30;
+	constexpr int totalWidth = cellWidth * columns;
+	constexpr int totalHeight = cellHeight * rows;
+	const Vec2 gridPos(wnd.mouse.GetPosX() - totalWidth/2, wnd.mouse.GetPosY() - totalHeight/2);
+
+	for (int cy = 0; cy <= rows; cy++) {
+		const int posY = cy * cellHeight;
+		const Vec2 start = Vec2(0.0f, (float)posY);
+		const Vec2 end = Vec2(totalWidth, (float)posY);
+		gfx.DrawLineClamped(start + gridPos, end + gridPos, Colors::White);
+	}
+	for (int cx = 0; cx <= columns; cx++) {
+		int posX = cx * cellWidth;
+		const Vec2 start = Vec2((float)posX, 0.0f);
+		const Vec2 end = Vec2((float)posX, totalHeight);
+		gfx.DrawLineClamped(start + gridPos, end + gridPos, Colors::White);
+	}
 }
