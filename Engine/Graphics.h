@@ -61,6 +61,7 @@ public:
 	void DrawLine(const Vec2& p1, const Vec2& p2, Color c);
 	void DrawLine(float x1, float y1, float x2, float y2, Color c);
 	void DrawLineClamped(Vec2 p1, Vec2 p2, Color c);
+	void DrawCircle(Vei2 pos, int radius, Color c);
 	~Graphics();
 private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain>				pSwapChain;

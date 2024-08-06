@@ -404,6 +404,23 @@ void Graphics::DrawLineClamped(Vec2 p1, Vec2 p2, Color c) {
 	DrawLine(p1.x, p1.y, p2.x, p2.y, c);
 }
 
+void Graphics::DrawCircle(Vei2 center, int radius, Color c) {
+	const int left = std::clamp(center.x - radius, 0, ScreenWidth - 1);
+	const int right = std::clamp(center.x + radius, 0, ScreenWidth - 1);
+	const int top = std::clamp(center.y - radius, 0, ScreenHeight - 1);
+	const int bottom = std::clamp(center.y + radius, 0, ScreenHeight - 1);
+	
+	for (int y = top; y <= bottom; y++) {
+		for (int x = left; x <= right; x++) {
+			Vec2 delta = { (float)center.x - x, (float)center.y - y};
+			const float distanceSqr = delta.LenSq();
+			if (distanceSqr < pow(radius, 2)) {
+				PutPixel(x, y, c);
+			}
+		}
+	}
+}
+
 //////////////////////////////////////////////////
 //           Graphics Exception
 Graphics::Exception::Exception( HRESULT hr,const std::wstring& note,const wchar_t* file,unsigned int line )
