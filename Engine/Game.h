@@ -1,5 +1,5 @@
-/****************************************************************************************** 
- *	Chili DirectX Framework Version 16.07.20											  *	
+/******************************************************************************************
+ *	Chili DirectX Framework Version 16.07.20											  *
  *	Game.h																				  *
  *	Copyright 2016 PlanetChili.net <http://www.planetchili.net>							  *
  *																						  *
@@ -25,12 +25,11 @@
 #include "Graphics.h"
 #include "Timer.h"
 
-class Game
-{
+class Game {
 public:
-	Game( class MainWindow& wnd );
-	Game( const Game& ) = delete;
-	Game& operator=( const Game& ) = delete;
+	Game(class MainWindow& wnd);
+	Game(const Game&) = delete;
+	Game& operator=(const Game&) = delete;
 	void Go();
 private:
 	void ComposeFrame();
@@ -44,5 +43,8 @@ private:
 	/********************************/
 	/*  User Variables              */
 	Timer timer;
+	Vec2 playerPos = { gfx.ScreenWidth / 2, gfx.ScreenHeight / 2 };
+	float playerAngle = 0.0f;
+	Vec2 playerDirection = {1.0f, 0.0f};
 	/********************************/
 };

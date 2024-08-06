@@ -9,7 +9,7 @@ public:
 	float Mark() {
 		std::chrono::steady_clock::time_point old = last;
 		last = std::chrono::steady_clock::now();
-		std::chrono::duration<float> elapsed = old - last;
+		std::chrono::duration<float> elapsed = last - old;
 		return elapsed.count();
 	}
 	float Peek() {

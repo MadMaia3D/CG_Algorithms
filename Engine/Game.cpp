@@ -36,9 +36,27 @@ void Game::Go() {
 }
 
 void Game::UpdateModel() {
+	const float deltaTime = timer.Mark();
+
+	playerDirection = { cos(playerAngle), sin(playerAngle) };
+
+	constexpr float rotationSpeed = 2.0f;
+	if (wnd.kbd.KeyIsPressed('A')) {
+		playerAngle -= rotationSpeed * deltaTime;
+	}
+	if (wnd.kbd.KeyIsPressed('D')) {
+		playerAngle += rotationSpeed * deltaTime;
+	}
+
+	if (wnd.kbd.KeyIsPressed('W')) {
+		playerPos += playerDirection * 100 * deltaTime;
+	}
 }
 
 void Game::ComposeFrame() {
 	Grid grid({ 100, 100 }, 14, 10, 40, 40);
 	grid.DrawFilled(Colors::Black, { 150 ,150 ,150 }, gfx);
+
+	gfx.DrawCircle((Vei2)playerPos, 5, Colors::Red);
+	gfx.DrawLine(playerPos, playerPos + playerDirection * 100, Colors::Red);
 }
