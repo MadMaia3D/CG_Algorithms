@@ -33,10 +33,10 @@ public:
 		int right = position.x + totalWidth;
 		int bottom = position.y + totalHeight;
 
-		left = std::clamp(left, 0, gfx.ScreenWidth);
-		right = std::clamp(right, 0, gfx.ScreenWidth);
-		top = std::clamp(top, 0, gfx.ScreenHeight);
-		bottom = std::clamp(bottom, 0, gfx.ScreenHeight);
+		left = std::clamp(left, 0, (int)gfx.ScreenWidth);
+		right = std::clamp(right, 0, (int)gfx.ScreenWidth);
+		top = std::clamp(top, 0, (int)gfx.ScreenHeight);
+		bottom = std::clamp(bottom, 0, (int)gfx.ScreenHeight);
 
 		for (int cy = top; cy < bottom; cy++) {
 			for (int cx = left; cx < right; cx++) {

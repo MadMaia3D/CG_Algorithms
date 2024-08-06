@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "Game.h"
 #include "Grid.h"
+#include "Surface.h"
 
 Game::Game(MainWindow& wnd)
 	:
