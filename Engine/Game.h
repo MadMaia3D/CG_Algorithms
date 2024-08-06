@@ -24,6 +24,7 @@
 #include "Mouse.h"
 #include "Graphics.h"
 #include "Timer.h"
+#include "Player.h"
 
 class Game {
 public:
@@ -43,8 +44,6 @@ private:
 	/********************************/
 	/*  User Variables              */
 	Timer timer;
-	Vec2 playerPos = { gfx.ScreenWidth / 2, gfx.ScreenHeight / 2 };
-	float playerAngle = 0.0f;
-	Vec2 playerDirection = {1.0f, 0.0f};
+	Player player;
 	/********************************/
 };
