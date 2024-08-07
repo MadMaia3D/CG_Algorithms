@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <optional>
+#include <limits>
 #include "Player.h"
 #include "Map.h"
 
@@ -13,19 +15,45 @@ public:
 		direction = { cos(angle), sin(angle) };
 		isFacingUp = angle > PI;
 		isFacingDown = angle < PI;
-		isFacingLeft = angle > PI/2 && angle < 3 * PI/2;
+		isFacingLeft = angle > PI / 2 && angle < 3 * PI / 2;
 		isFacingRight = angle > 3 * PI / 2 || angle < PI / 2;
 	}
 
 	void Cast(const Map *pMap) {
-		CheckHorizontalCollisions(pMap);
-		CheckVerticalCollisions(pMap);
-	}
+		std::optional<Vec2> hCollision = CheckHorizontalCollisions(pMap);
+		std::optional<Vec2> vCollision = CheckVerticalCollisions(pMap);
 
-	void CheckHorizontalCollisions(const Map *pMap) {
+		const bool hHasValue = hCollision.has_value();
+		const bool vHasValue = vCollision.has_value();
+
+		if (!hHasValue && !vHasValue) { return; }
+
+		const int cellWidth = pMap->GetCellWidth();
 		const int cellHeight = pMap->GetCellHeight();
 
-		Vec2 origin = position / (float)cellHeight; // grid space
+		const Vec2 origin = { position.x / (float)cellWidth , position.y / (float)cellWidth };
+
+		float horizontalDistanceSqr = std::numeric_limits<float>::infinity();
+		float verticalDistanceSqr = std::numeric_limits<float>::infinity();
+
+		if (hHasValue) {
+			horizontalDistanceSqr = Vec2(origin - hCollision.value()).LenSq();
+		}
+		if (vHasValue) {
+			verticalDistanceSqr = Vec2(origin - vCollision.value()).LenSq();
+		}
+
+		if (horizontalDistanceSqr < verticalDistanceSqr) {
+			hit = *hCollision;
+		} else {
+			hit = *vCollision;
+		}
+	}
+
+	std::optional<Vec2> CheckHorizontalCollisions(const Map *pMap) {
+		const int cellHeight = pMap->GetCellHeight();
+
+		const Vec2 origin = position / (float)cellHeight; // grid space
 		Vec2 hHit1;
 		Vec2 hHit2;
 		const float tanTheta = tan(angle);
@@ -37,7 +65,7 @@ public:
 			hHit1.y = floor(origin.y);
 			hHit2.y = hHit1.y - 1;
 		} else {
-			return;
+			return {};
 		}
 
 		hHit1.x = (hHit1.y - origin.y) / tanTheta + origin.x;
@@ -48,13 +76,17 @@ public:
 		const int nRows = pMap->GetNRows();
 		const int nColumns = pMap->GetNColumns();
 
-		while (nextHit.y >= 0 && nextHit.y <= nRows && nextHit.x >= 0 && nextHit.x <= nColumns) {
-			hits.push_back(nextHit);
+		while (nextHit.y > 0 && nextHit.y < nRows && nextHit.x > 0 && nextHit.x < nColumns) {
+			const int targetCellY = int(floor(nextHit.y + hDelta.y / 2));
+			if (pMap->HasWallAt((int)nextHit.x, targetCellY)) {
+				return nextHit;
+			}
 			nextHit += hDelta;
 		}
+		return {};
 	}
 
-	void CheckVerticalCollisions(const Map *pMap) {
+	std::optional<Vec2> CheckVerticalCollisions(const Map *pMap) {
 		const int cellWidth = pMap->GetCellWidth();
 
 		Vec2 origin = position / (float)cellWidth; // grid space
@@ -68,6 +100,8 @@ public:
 		} else if (isFacingLeft) {
 			vHit1.x = floor(origin.x);
 			vHit2.x = vHit1.x - 1;
+		} else {
+			return {};
 		}
 
 		vHit1.y = (vHit1.x - origin.x) * tanTheta + origin.y;
@@ -78,18 +112,22 @@ public:
 		const int nRows = pMap->GetNRows();
 		const int nColumns = pMap->GetNColumns();
 
-		while (nextHit.y >= 0 && nextHit.y <= nRows && nextHit.x >= 0 && nextHit.x <= nColumns) {
-			hits.push_back(nextHit);
+		while (nextHit.y > 0 && nextHit.y < nRows && nextHit.x > 0 && nextHit.x < nColumns) {
+			const int targetCellX = int(floor(nextHit.x + vDelta.x / 2));
+			if (pMap->HasWallAt(targetCellX, (int)nextHit.y)) {
+				return nextHit;
+			}
 			nextHit += vDelta;
 		}
+		return {};
 	}
 
 	void Draw(const Map *pMap, Graphics& gfx, Color c) const {
-		float distance = 200.0f;
-		gfx.DrawLineClamped(position, position + direction * distance, c);
-		for (const Vec2& hit : hits) {
-			Vec2 drawPos = { hit.x * pMap->GetCellHeight(), hit.y * pMap->GetCellHeight() };
-			gfx.DrawCircle( Vei2(drawPos), 3, Colors::Magenta);
+		//const float distance = 200.0f;
+		//gfx.DrawLineClamped(position, position + direction * distance, c);
+		if (hit.has_value()) {
+			Vec2 drawPos = { hit.value().x * pMap->GetCellWidth(), hit.value().y * pMap->GetCellHeight() };
+			gfx.DrawCircle(Vei2(drawPos), 3, Colors::Magenta);
 		}
 	}
 
@@ -98,7 +136,7 @@ private:
 	float angle;
 	Vec2 direction;
 	static constexpr int maxHits = 10;
-	std::vector<Vec2> hits;
+	std::optional<Vec2> hit;
 
 	bool isFacingUp = angle > PI;
 	bool isFacingDown = !isFacingUp;
@@ -128,10 +166,20 @@ public:
 			rayAngle += rayAngleStep;
 			rays.back().Cast(pMap);
 		}
-
 	}
 
 	void Draw(const Map *pMap, Graphics& gfx, Color c) {
+		const Vec2 position = pPlayer->GetPosition();
+		const float angle = pPlayer->GetAngle();
+		const float rayAngle1 = angle - FOV / 2;
+		const float rayAngle2 = angle + FOV / 2;
+		const Vec2 direction1 = {cos(rayAngle1), sin(rayAngle1)};
+		const Vec2 direction2 = {cos(rayAngle2), sin(rayAngle2)};
+		const float distance = 100.0f;
+
+		gfx.DrawLineClamped(position, position + direction1 * distance, c);
+		gfx.DrawLineClamped(position, position + direction2 * distance, c);
+
 		for (const Ray& r : rays) {
 			r.Draw(pMap, gfx, c);
 		}
@@ -141,5 +189,5 @@ private:
 	Player *pPlayer;
 	const float FOV = MathUtilities::ToRadians(60.0f);
 	std::vector<Ray> rays;
-	const int nRays = 16;
+	const int nRays = 128;
 };

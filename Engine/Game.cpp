@@ -26,9 +26,9 @@ Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
 	gfx(wnd),
-	map({ 0, 0 }, 30, 30, L"Maps/test.bmp"),
+	map({ 0, 0 }, 20, 20, L"Maps/test.bmp"),
 	player({ gfx.ScreenWidth / 4, gfx.ScreenHeight / 4 }),
-	raycaster(&player)
+	raycaster(&map, &player)
 {
 }
 

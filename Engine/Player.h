@@ -26,21 +26,19 @@ public:
 		if (kbd.KeyIsPressed('A')) { rotationDirection -= 1; }
 		if (kbd.KeyIsPressed('D')) { rotationDirection += 1; }
 
-		angle += rotationDirection * rotationSpeed * deltaTime;
-		direction = { cos(angle), sin(angle) };
-
 		if (kbd.KeyIsPressed('W')) {
 			walkDirection += 1;
 		} else if (kbd.KeyIsPressed('S')) {
 			walkDirection -= 1;
 			rotationDirection = -rotationDirection;
 		}
-
+		angle += rotationDirection * rotationSpeed * deltaTime;
+		direction = { cos(angle), sin(angle) };
 		position += direction * walkSpeed * walkDirection * deltaTime;
 	}
 	void Draw(Graphics& gfx, Color color) const {
 		gfx.DrawCircle((Vei2)position, 5, color);
-		gfx.DrawLineClamped(position, position + direction * 250, color);
+		//gfx.DrawLineClamped(position, position + direction * 250, color);
 	}
 private:
 	Vec2 position;
