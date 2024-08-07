@@ -68,22 +68,18 @@ public:
 		DrawLines(Colors::Black, gfx);
 	}
 
-	void SetPosition(Vei2 pos) {
-		position = pos;
-	}
-
 	bool HasWallAt(int x, int y) const {
 		const int index = y * nColumns + x;
 		return data[index] == CellType::Wall;
 	}
 
-	int GetCellWidth() const {
-		return cellWidth;
-	}
 
-	int GetCellHeight() const {
-		return cellHeight;
-	}
+	void SetPosition(Vei2 pos) { position = pos; }
+	Vei2 GetPosition() const { return position; }
+	int GetCellWidth() const { return cellWidth; }
+	int GetCellHeight() const { return cellHeight; }
+	int GetNRows() const { return nRows; }
+	int GetNColumns() const { return nColumns; }
 
 private:
 	void DrawLines(Color color, Graphics &gfx) const {
