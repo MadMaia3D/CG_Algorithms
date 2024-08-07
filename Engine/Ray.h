@@ -20,52 +20,6 @@ public:
 	void Cast(const Map *pMap) {
 		CheckHorizontalCollisions(pMap);
 		CheckVerticalCollisions(pMap);
-		//constexpr int cellSize = 30;
-
-		//Vec2 origin = position / (float)cellSize; // grid space
-		//Vec2 hHit1;
-		//Vec2 hHit2;
-		//Vec2 vHit1;
-		//Vec2 vHit2;
-		//const float tanTheta = tan(angle);
-
-		//if (isFacingDown) {
-		//	hHit1.y = ceil(origin.y);
-		//	hHit2.y = hHit1.y + 1;
-		//} else if (isFacingUp) {
-		//	hHit1.y = floor(origin.y);
-		//	hHit2.y = hHit1.y - 1;
-		//} else {
-		//	return;
-		//}
-
-		//if (isFacingRight) {
-		//	vHit1.x = ceil(origin.x);
-		//	vHit2.x = vHit1.x + 1;
-		//} else if (isFacingLeft) {
-		//	vHit1.x = floor(origin.x);
-		//	vHit2.x = vHit1.x - 1;
-		//}
-
-		//hHit1.x = (hHit1.y - origin.y) / tanTheta + origin.x;
-		//hHit2.x = (hHit2.y - hHit1.y) / tanTheta + hHit1.x;
-		//const Vec2 hDelta = hHit2 - hHit1;
-		//vHit1.y = (vHit1.x - origin.x) * tanTheta + origin.y;
-		//vHit2.y = (vHit2.x - vHit1.x) * tanTheta + vHit1.y;
-		//const Vec2 vDelta = vHit2 - vHit1;
-
-		//hits.reserve(maxHits * 2);
-		//hits.push_back(hHit1);
-		//hits.push_back(vHit1);
-		//hits.push_back(hHit2);
-		//hits.push_back(vHit2);
-
-
-		/*for (size_t i = hits.size(); i < hits.capacity() / 2; i++) {
-			hits.emplace_back(hits[hits.size() - 2] + hDelta);
-			hits.emplace_back(hits[hits.size() - 2] + vDelta);
-		}*/
-
 	}
 
 	void CheckHorizontalCollisions(const Map *pMap) {
@@ -90,8 +44,14 @@ public:
 		hHit2.x = (hHit2.y - hHit1.y) / tanTheta + hHit1.x;
 		const Vec2 hDelta = hHit2 - hHit1;
 
-		hits.push_back(hHit1);
-		hits.push_back(hHit2);
+		Vec2 nextHit = hHit1;
+		const int nRows = pMap->GetNRows();
+		const int nColumns = pMap->GetNColumns();
+
+		while (nextHit.y >= 0 && nextHit.y <= nRows && nextHit.x >= 0 && nextHit.x <= nColumns) {
+			hits.push_back(nextHit);
+			nextHit += hDelta;
+		}
 	}
 
 	void CheckVerticalCollisions(const Map *pMap) {
@@ -101,7 +61,6 @@ public:
 		Vec2 vHit1;
 		Vec2 vHit2;
 		const float tanTheta = tan(angle);
-
 
 		if (isFacingRight) {
 			vHit1.x = ceil(origin.x);
@@ -115,8 +74,14 @@ public:
 		vHit2.y = (vHit2.x - vHit1.x) * tanTheta + vHit1.y;
 		const Vec2 vDelta = vHit2 - vHit1;
 
-		hits.push_back(vHit1);
-		hits.push_back(vHit2);
+		Vec2 nextHit = vHit1;
+		const int nRows = pMap->GetNRows();
+		const int nColumns = pMap->GetNColumns();
+
+		while (nextHit.y >= 0 && nextHit.y <= nRows && nextHit.x >= 0 && nextHit.x <= nColumns) {
+			hits.push_back(nextHit);
+			nextHit += vDelta;
+		}
 	}
 
 	void Draw(const Map *pMap, Graphics& gfx, Color c) const {
@@ -146,8 +111,9 @@ private:
 
 class Raycaster {
 public:
-	Raycaster(Player *pPlayer)
+	Raycaster(const Map *pMap, Player *pPlayer)
 		:
+		pMap(pMap),
 		pPlayer(pPlayer) {
 		rays.reserve(nRays);
 	}
@@ -171,8 +137,9 @@ public:
 		}
 	}
 private:
-	const float FOV = MathUtilities::ToRadians(60.0f);
-	const int nRays = 4;
+	const Map *pMap;
 	Player *pPlayer;
+	const float FOV = MathUtilities::ToRadians(60.0f);
 	std::vector<Ray> rays;
+	const int nRays = 16;
 };
