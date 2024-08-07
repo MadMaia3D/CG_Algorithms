@@ -26,6 +26,7 @@
 #include "Timer.h"
 #include "Map.h"
 #include "Player.h"
+#include "Ray.h"
 
 class Game {
 public:
@@ -47,5 +48,6 @@ private:
 	Timer timer;
 	Map map;
 	Player player;
+	Raycaster raycaster;
 	/********************************/
 };

@@ -26,9 +26,11 @@ Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
 	gfx(wnd),
-	map({ 50, 50 }, 30, 30, L"Maps/test.bmp"),
-	player({gfx.ScreenWidth/2, gfx.ScreenHeight/2})
-{}
+	map({ 0, 0 }, 30, 30, L"Maps/test.bmp"),
+	player({ gfx.ScreenWidth / 4, gfx.ScreenHeight / 4 }),
+	raycaster(&player)
+{
+}
 
 void Game::Go() {
 	gfx.BeginFrame();
@@ -40,9 +42,11 @@ void Game::Go() {
 void Game::UpdateModel() {
 	const float deltaTime = timer.Mark();
 	player.ProcessInput(wnd.kbd, deltaTime);
+	raycaster.CastAllRays();
 }
 
 void Game::ComposeFrame() {
 	map.Draw(gfx);
 	player.Draw(gfx, Colors::Red);
+	raycaster.Draw(gfx, Colors::Red);
 }
