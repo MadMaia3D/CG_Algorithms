@@ -24,6 +24,7 @@
 #include "Mouse.h"
 #include "Graphics.h"
 #include "Timer.h"
+#include "Map.h"
 #include "Player.h"
 
 class Game {
@@ -44,6 +45,7 @@ private:
 	/********************************/
 	/*  User Variables              */
 	Timer timer;
+	Map map;
 	Player player;
 	/********************************/
 };

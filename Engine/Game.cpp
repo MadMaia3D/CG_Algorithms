@@ -20,16 +20,15 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
-#include "Grid.h"
 #include "Surface.h"
 
 Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
 	gfx(wnd),
+	map({ 50, 50 }, 30, 30, L"Maps/test.bmp"),
 	player({gfx.ScreenWidth/2, gfx.ScreenHeight/2})
-{
-}
+{}
 
 void Game::Go() {
 	gfx.BeginFrame();
@@ -44,7 +43,6 @@ void Game::UpdateModel() {
 }
 
 void Game::ComposeFrame() {
-	Grid grid({ 100, 100 }, 14, 10, 40, 40);
-	grid.DrawFilled(Colors::Black, Colors::Gray, gfx);
+	map.Draw(gfx);
 	player.Draw(gfx, Colors::Red);
 }
