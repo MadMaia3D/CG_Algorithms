@@ -42,11 +42,11 @@ void Game::Go() {
 void Game::UpdateModel() {
 	const float deltaTime = timer.Mark();
 	player.ProcessInput(wnd.kbd, deltaTime);
-	raycaster.CastAllRays();
+	raycaster.CastAllRays(&map);
 }
 
 void Game::ComposeFrame() {
 	map.Draw(gfx);
 	player.Draw(gfx, Colors::Red);
-	raycaster.Draw(gfx, Colors::Red);
+	raycaster.Draw(&map, gfx, Colors::Red);
 }

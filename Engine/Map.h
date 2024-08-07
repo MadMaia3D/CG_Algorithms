@@ -68,6 +68,24 @@ public:
 		DrawLines(Colors::Black, gfx);
 	}
 
+	void SetPosition(Vei2 pos) {
+		position = pos;
+	}
+
+	bool HasWallAt(int x, int y) const {
+		const int index = y * nColumns + x;
+		return data[index] == CellType::Wall;
+	}
+
+	int GetCellWidth() const {
+		return cellWidth;
+	}
+
+	int GetCellHeight() const {
+		return cellHeight;
+	}
+
+private:
 	void DrawLines(Color color, Graphics &gfx) const {
 		for (int cy = 0; cy <= nRows; cy++) {
 			const int posY = cy * cellHeight;
@@ -89,7 +107,7 @@ public:
 
 		switch (data[cellIndex]) {
 		case CellType::Empty:
-			c = { 224,224,224};
+			c = { 224,224,224 };
 			break;
 		case CellType::Wall:
 			c = { 48,48,48 };
@@ -113,10 +131,6 @@ public:
 				DrawCell(x, y, gfx);
 			}
 		}
-	}
-
-	void SetPosition(Vei2 pos) {
-		position = pos;
 	}
 
 private:
