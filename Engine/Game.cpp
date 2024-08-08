@@ -27,9 +27,13 @@ Game::Game(MainWindow& wnd)
 	wnd(wnd),
 	gfx(wnd),
 	map({ 0, 0 }, 20, 20, L"Maps/test.bmp"),
-	player({ gfx.ScreenWidth / 4, gfx.ScreenHeight / 4 }),
+	player({ gfx.ScreenWidth / 2, gfx.ScreenHeight / 2 }),
 	raycaster(&map, &player)
 {
+	Vei2 topLeft;
+	topLeft.x = (int)gfx.ScreenWidth / 2 - map.GetTotalWidth() / 2;
+	topLeft.y = (int)gfx.ScreenHeight / 2 - map.GetTotalHeight() / 2;
+	map.SetPosition(topLeft);
 }
 
 void Game::Go() {
