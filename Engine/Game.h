@@ -26,7 +26,7 @@
 #include "Timer.h"
 #include "Map.h"
 #include "Player.h"
-#include "Ray.h"
+#include "Raycaster.h"
 
 class Game {
 public:
