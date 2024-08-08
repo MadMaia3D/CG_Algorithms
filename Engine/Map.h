@@ -86,11 +86,11 @@ public:
 	/* ---------------- Convert From Screen Space to Grid Space and Vice-Versa ---------------- */
 	static Vec2 ToMapSpace(const Map *pMap, Vec2 pos) {
 		pos -= (Vec2)pMap->GetPosition();
-		return { pos.x / pMap->GetCellHeight(), pos.y / pMap->GetCellWidth() };
+		return { pos.x / pMap->GetCellWidth(), pos.y / pMap->GetCellHeight() };
 	}
 
 	static Vec2 ToScreenSpace(const Map *pMap, Vec2 pos) {
-		return Vec2(pos.x * pMap->GetCellHeight(), pos.y * pMap->GetCellWidth()) + (Vec2)pMap->GetPosition();
+		return Vec2(pos.x * pMap->GetCellWidth(), pos.y * pMap->GetCellHeight()) + (Vec2)pMap->GetPosition();
 	}
 
 	/* ---------------- Questions ---------------- */
