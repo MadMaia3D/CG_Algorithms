@@ -64,9 +64,11 @@ public:
 		}
 	}
 
-	void Draw(Graphics &gfx) {
+	void Draw(Graphics &gfx, bool drawBorders = true) {
 		DrawAllCells(gfx);
-		DrawLines(Colors::Black, gfx);
+		if (drawBorders) {
+			DrawLines(Colors::Black, gfx);
+		}
 	}
 
 	void PaintCell(Vei2 cell, Graphics &gfx, Color c) const {
