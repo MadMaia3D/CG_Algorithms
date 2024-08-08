@@ -1,5 +1,5 @@
-/******************************************************************************************
-*	Chili DirectX Framework Version 16.07.20											  *
+﻿/******************************************************************************************
+*	Chili DirectX Framework Version 16.10.01											  *
 *	Graphics.cpp																		  *
 *	Copyright 2016 PlanetChili.net <http://www.planetchili.net>							  *
 *																						  *
@@ -25,24 +25,25 @@
 #include <assert.h>
 #include <string>
 #include <array>
+#include <functional>
+#include "ChiliWin.h"
+#include <algorithm>
 
 // Ignore the intellisense error "cannot open source file" for .shh files.
 // They will be created during the build sequence before the preprocessor runs.
-namespace FramebufferShaders
-{
+namespace FramebufferShaders {
 #include "FramebufferPS.shh"
 #include "FramebufferVS.shh"
 }
 
 #pragma comment( lib,"d3d11.lib" )
 
-#define CHILI_GFX_EXCEPTION( hr,note ) Graphics::Exception( hr,note,_CRT_WIDE(__FILE__),__LINE__ )
-
 using Microsoft::WRL::ComPtr;
 
-Graphics::Graphics( HWNDKey& key )
-{
-	assert( key.hWnd != nullptr );
+Graphics::Graphics(HWNDKey& key)
+	:
+	sysBuffer(ScreenWidth, ScreenHeight) {
+	assert(key.hWnd != nullptr);
 
 	//////////////////////////////////////////////////////
 	// create device and swap chain/get render target view
@@ -59,65 +60,65 @@ Graphics::Graphics( HWNDKey& key )
 	sd.SampleDesc.Quality = 0;
 	sd.Windowed = TRUE;
 
+	D3D_FEATURE_LEVEL	featureLevelsRequested = D3D_FEATURE_LEVEL_9_1;
+	UINT				numLevelsRequested = 1;
+	D3D_FEATURE_LEVEL	featureLevelsSupported;
 	HRESULT				hr;
 	UINT				createFlags = 0u;
-#ifdef CHILI_USE_D3D_DEBUG_LAYER
 #ifdef _DEBUG
+#ifdef USE_DIRECT3D_DEBUG_RUNTIME
 	createFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 #endif
-	
+
 	// create device and front/back buffers
-	if( FAILED( hr = D3D11CreateDeviceAndSwapChain( 
+	if (FAILED(hr = D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
 		createFlags,
-		nullptr,
-		0,
+		&featureLevelsRequested,
+		numLevelsRequested,
 		D3D11_SDK_VERSION,
 		&sd,
 		&pSwapChain,
 		&pDevice,
-		nullptr,
-		&pImmediateContext ) ) )
-	{
-		throw CHILI_GFX_EXCEPTION( hr,L"Creating device and swap chain" );
+		&featureLevelsSupported,
+		&pImmediateContext))) {
+		throw CHILI_GFX_EXCEPTION(hr, L"Creating device and swap chain");
 	}
 
 	// get handle to backbuffer
 	ComPtr<ID3D11Resource> pBackBuffer;
-	if( FAILED( hr = pSwapChain->GetBuffer(
+	if (FAILED(hr = pSwapChain->GetBuffer(
 		0,
-		__uuidof( ID3D11Texture2D ),
-		(LPVOID*)&pBackBuffer ) ) )
-	{
-		throw CHILI_GFX_EXCEPTION( hr,L"Getting back buffer" );
+		__uuidof(ID3D11Texture2D),
+		(LPVOID*)&pBackBuffer))) {
+		throw CHILI_GFX_EXCEPTION(hr, L"Getting back buffer");
 	}
 
 	// create a view on backbuffer that we can render to
-	if( FAILED( hr = pDevice->CreateRenderTargetView( 
+	if (FAILED(hr = pDevice->CreateRenderTargetView(
 		pBackBuffer.Get(),
 		nullptr,
-		&pRenderTargetView ) ) )
-	{
-		throw CHILI_GFX_EXCEPTION( hr,L"Creating render target view on backbuffer" );
+		&pRenderTargetView))) {
+		throw CHILI_GFX_EXCEPTION(hr, L"Creating render target view on backbuffer");
 	}
 
 
 	// set backbuffer as the render target using created view
-	pImmediateContext->OMSetRenderTargets( 1,pRenderTargetView.GetAddressOf(),nullptr );
+	pImmediateContext->OMSetRenderTargets(1, pRenderTargetView.GetAddressOf(), nullptr);
 
 
 	// set viewport dimensions
 	D3D11_VIEWPORT vp;
-	vp.Width = float( Graphics::ScreenWidth );
-	vp.Height = float( Graphics::ScreenHeight );
+	vp.Width = float(Graphics::ScreenWidth);
+	vp.Height = float(Graphics::ScreenHeight);
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0.0f;
 	vp.TopLeftY = 0.0f;
-	pImmediateContext->RSSetViewports( 1,&vp );
+	pImmediateContext->RSSetViewports(1, &vp);
 
 
 	///////////////////////////////////////
@@ -135,9 +136,8 @@ Graphics::Graphics( HWNDKey& key )
 	sysTexDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	sysTexDesc.MiscFlags = 0;
 	// create the texture
-	if( FAILED( hr = pDevice->CreateTexture2D( &sysTexDesc,nullptr,&pSysBufferTexture ) ) )
-	{
-		throw CHILI_GFX_EXCEPTION( hr,L"Creating sysbuffer texture" );
+	if (FAILED(hr = pDevice->CreateTexture2D(&sysTexDesc, nullptr, &pSysBufferTexture))) {
+		throw CHILI_GFX_EXCEPTION(hr, L"Creating sysbuffer texture");
 	}
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -145,38 +145,35 @@ Graphics::Graphics( HWNDKey& key )
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
 	// create the resource view on the texture
-	if( FAILED( hr = pDevice->CreateShaderResourceView( pSysBufferTexture.Get(),
-		&srvDesc,&pSysBufferTextureView ) ) )
-	{
-		throw CHILI_GFX_EXCEPTION( hr,L"Creating view on sysBuffer texture" );
+	if (FAILED(hr = pDevice->CreateShaderResourceView(pSysBufferTexture.Get(),
+													  &srvDesc, &pSysBufferTextureView))) {
+		throw CHILI_GFX_EXCEPTION(hr, L"Creating view on sysBuffer texture");
 	}
 
 
 	////////////////////////////////////////////////
 	// create pixel shader for framebuffer
 	// Ignore the intellisense error "namespace has no member"
-	if( FAILED( hr = pDevice->CreatePixelShader(
+	if (FAILED(hr = pDevice->CreatePixelShader(
 		FramebufferShaders::FramebufferPSBytecode,
-		sizeof( FramebufferShaders::FramebufferPSBytecode ),
+		sizeof(FramebufferShaders::FramebufferPSBytecode),
 		nullptr,
-		&pPixelShader ) ) )
-	{
-		throw CHILI_GFX_EXCEPTION( hr,L"Creating pixel shader" );
+		&pPixelShader))) {
+		throw CHILI_GFX_EXCEPTION(hr, L"Creating pixel shader");
 	}
-	
+
 
 	/////////////////////////////////////////////////
 	// create vertex shader for framebuffer
 	// Ignore the intellisense error "namespace has no member"
-	if( FAILED( hr = pDevice->CreateVertexShader(
+	if (FAILED(hr = pDevice->CreateVertexShader(
 		FramebufferShaders::FramebufferVSBytecode,
-		sizeof( FramebufferShaders::FramebufferVSBytecode ),
+		sizeof(FramebufferShaders::FramebufferVSBytecode),
 		nullptr,
-		&pVertexShader ) ) )
-	{
-		throw CHILI_GFX_EXCEPTION( hr,L"Creating vertex shader" );
+		&pVertexShader))) {
+		throw CHILI_GFX_EXCEPTION(hr, L"Creating vertex shader");
 	}
-	
+
 
 	//////////////////////////////////////////////////////////////
 	// create and fill vertex buffer with quad for rendering frame
@@ -191,17 +188,16 @@ Graphics::Graphics( HWNDKey& key )
 	};
 	D3D11_BUFFER_DESC bd = {};
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof( FSQVertex ) * 6;
+	bd.ByteWidth = sizeof(FSQVertex) * 6;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0u;
 	D3D11_SUBRESOURCE_DATA initData = {};
 	initData.pSysMem = vertices;
-	if( FAILED( hr = pDevice->CreateBuffer( &bd,&initData,&pVertexBuffer ) ) )
-	{
-		throw CHILI_GFX_EXCEPTION( hr,L"Creating vertex buffer" );
+	if (FAILED(hr = pDevice->CreateBuffer(&bd, &initData, &pVertexBuffer))) {
+		throw CHILI_GFX_EXCEPTION(hr, L"Creating vertex buffer");
 	}
 
-	
+
 	//////////////////////////////////////////
 	// create input layout for fullscreen quad
 	const D3D11_INPUT_ELEMENT_DESC ied[] =
@@ -211,12 +207,11 @@ Graphics::Graphics( HWNDKey& key )
 	};
 
 	// Ignore the intellisense error "namespace has no member"
-	if( FAILED( hr = pDevice->CreateInputLayout( ied,2,
-		FramebufferShaders::FramebufferVSBytecode,
-		sizeof( FramebufferShaders::FramebufferVSBytecode ),
-		&pInputLayout ) ) )
-	{
-		throw CHILI_GFX_EXCEPTION( hr,L"Creating input layout" );
+	if (FAILED(hr = pDevice->CreateInputLayout(ied, 2,
+											   FramebufferShaders::FramebufferVSBytecode,
+											   sizeof(FramebufferShaders::FramebufferVSBytecode),
+											   &pInputLayout))) {
+		throw CHILI_GFX_EXCEPTION(hr, L"Creating input layout");
 	}
 
 
@@ -230,131 +225,199 @@ Graphics::Graphics( HWNDKey& key )
 	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 	sampDesc.MinLOD = 0;
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	if( FAILED( hr = pDevice->CreateSamplerState( &sampDesc,&pSamplerState ) ) )
-	{
-		throw CHILI_GFX_EXCEPTION( hr,L"Creating sampler state" );
+	if (FAILED(hr = pDevice->CreateSamplerState(&sampDesc, &pSamplerState))) {
+		throw CHILI_GFX_EXCEPTION(hr, L"Creating sampler state");
 	}
-
-	// allocate memory for sysbuffer (16-byte aligned for faster access)
-	pSysBuffer = reinterpret_cast<Color*>( 
-		_aligned_malloc( sizeof( Color ) * Graphics::ScreenWidth * Graphics::ScreenHeight,16u ) );
 }
 
-Graphics::~Graphics()
-{
-	// free sysbuffer memory (aligned free)
-	if( pSysBuffer )
-	{
-		_aligned_free( pSysBuffer );
-		pSysBuffer = nullptr;
-	}
+Graphics::~Graphics() {
 	// clear the state of the device context before destruction
-	if( pImmediateContext ) pImmediateContext->ClearState();
+	if (pImmediateContext) pImmediateContext->ClearState();
 }
 
-void Graphics::EndFrame()
-{
+void Graphics::EndFrame() {
 	HRESULT hr;
 
 	// lock and map the adapter memory for copying over the sysbuffer
-	if( FAILED( hr = pImmediateContext->Map( pSysBufferTexture.Get(),0u,
-		D3D11_MAP_WRITE_DISCARD,0u,&mappedSysBufferTexture ) ) )
-	{
-		throw CHILI_GFX_EXCEPTION( hr,L"Mapping sysbuffer" );
+	if (FAILED(hr = pImmediateContext->Map(pSysBufferTexture.Get(), 0u,
+										   D3D11_MAP_WRITE_DISCARD, 0u, &mappedSysBufferTexture))) {
+		throw CHILI_GFX_EXCEPTION(hr, L"Mapping sysbuffer");
 	}
-	// setup parameters for copy operation
-	Color* pDst = reinterpret_cast<Color*>(mappedSysBufferTexture.pData );
-	const size_t dstPitch = mappedSysBufferTexture.RowPitch / sizeof( Color );
-	const size_t srcPitch = Graphics::ScreenWidth;
-	const size_t rowBytes = srcPitch * sizeof( Color );
 	// perform the copy line-by-line
-	for( size_t y = 0u; y < Graphics::ScreenHeight; y++ )
-	{
-		memcpy( &pDst[ y * dstPitch ],&pSysBuffer[y * srcPitch],rowBytes );
-	}
+	sysBuffer.Present(mappedSysBufferTexture.RowPitch,
+					  reinterpret_cast<BYTE*>(mappedSysBufferTexture.pData));
 	// release the adapter memory
-	pImmediateContext->Unmap( pSysBufferTexture.Get(),0u );
+	pImmediateContext->Unmap(pSysBufferTexture.Get(), 0u);
 
 	// render offscreen scene texture to back buffer
-	pImmediateContext->IASetInputLayout( pInputLayout.Get() );
-	pImmediateContext->VSSetShader( pVertexShader.Get(),nullptr,0u );
-	pImmediateContext->PSSetShader( pPixelShader.Get(),nullptr,0u );
-	pImmediateContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-	const UINT stride = sizeof( FSQVertex );
+	pImmediateContext->IASetInputLayout(pInputLayout.Get());
+	pImmediateContext->VSSetShader(pVertexShader.Get(), nullptr, 0u);
+	pImmediateContext->PSSetShader(pPixelShader.Get(), nullptr, 0u);
+	pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	const UINT stride = sizeof(FSQVertex);
 	const UINT offset = 0u;
-	pImmediateContext->IASetVertexBuffers( 0u,1u,pVertexBuffer.GetAddressOf(),&stride,&offset );
-	pImmediateContext->PSSetShaderResources( 0u,1u,pSysBufferTextureView.GetAddressOf() );
-	pImmediateContext->PSSetSamplers( 0u,1u,pSamplerState.GetAddressOf() );
-	pImmediateContext->Draw( 6u,0u );
+	pImmediateContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
+	pImmediateContext->PSSetShaderResources(0u, 1u, pSysBufferTextureView.GetAddressOf());
+	pImmediateContext->PSSetSamplers(0u, 1u, pSamplerState.GetAddressOf());
+	pImmediateContext->Draw(6u, 0u);
 
 	// flip back/front buffers
-	if( FAILED( hr = pSwapChain->Present( 1u,0u ) ) )
-	{
-		if( hr == DXGI_ERROR_DEVICE_REMOVED )
-		{
-			throw CHILI_GFX_EXCEPTION( pDevice->GetDeviceRemovedReason(),L"Presenting back buffer [device removed]" );
-		}
-		else
-		{
-			throw CHILI_GFX_EXCEPTION( hr,L"Presenting back buffer" );
-		}
+	if (FAILED(hr = pSwapChain->Present(1u, 0u))) {
+		throw CHILI_GFX_EXCEPTION(hr, L"Presenting back buffer");
 	}
 }
 
-void Graphics::BeginFrame()
-{
-	// clear the sysbuffer
-	memset( pSysBuffer,0u,sizeof( Color ) * Graphics::ScreenHeight * Graphics::ScreenWidth );
+void Graphics::BeginFrame() {
+	sysBuffer.Clear(Colors::Red);
 }
 
-void Graphics::PutPixel( int x,int y,Color c )
-{
-	assert( x >= 0 );
-	assert( x < int( Graphics::ScreenWidth ) );
-	assert( y >= 0 );
-	assert( y < int( Graphics::ScreenHeight ) );
-	pSysBuffer[Graphics::ScreenWidth * y + x] = c;
+void Graphics::DrawLine(const Vec2 & p1, const Vec2 & p2, Color c) {
+	DrawLine(p1.x, p1.y, p2.x, p2.y, c);
 }
-
 
 //////////////////////////////////////////////////
 //           Graphics Exception
-Graphics::Exception::Exception( HRESULT hr,const std::wstring& note,const wchar_t* file,unsigned int line )
+Graphics::Exception::Exception(HRESULT hr, const std::wstring& note, const wchar_t* file, unsigned int line)
 	:
-	ChiliException( file,line,note ),
-	hr( hr )
-{}
+	ChiliException(file, line, note),
+	hr(hr) {
+}
 
-std::wstring Graphics::Exception::GetFullMessage() const
-{
+std::wstring Graphics::Exception::GetFullMessage() const {
 	const std::wstring empty = L"";
 	const std::wstring errorName = GetErrorName();
 	const std::wstring errorDesc = GetErrorDescription();
 	const std::wstring& note = GetNote();
 	const std::wstring location = GetLocation();
-	return    (!errorName.empty() ? std::wstring( L"Error: " ) + errorName + L"\n"
-		: empty)
-		+ (!errorDesc.empty() ? std::wstring( L"Description: " ) + errorDesc + L"\n"
-			: empty)
-		+ (!note.empty() ? std::wstring( L"Note: " ) + note + L"\n"
-			: empty)
-		+ (!location.empty() ? std::wstring( L"Location: " ) + location
-			: empty);
+	return    (!errorName.empty() ? std::wstring(L"Error: ") + errorName + L"\n"
+			   : empty)
+		+ (!errorDesc.empty() ? std::wstring(L"Description: ") + errorDesc + L"\n"
+		   : empty)
+		+ (!note.empty() ? std::wstring(L"Note: ") + note + L"\n"
+		   : empty)
+		+ (!location.empty() ? std::wstring(L"Location: ") + location
+		   : empty);
 }
 
-std::wstring Graphics::Exception::GetErrorName() const
-{
-	return DXGetErrorString( hr );
+std::wstring Graphics::Exception::GetErrorName() const {
+	return DXGetErrorString(hr);
 }
 
-std::wstring Graphics::Exception::GetErrorDescription() const
-{
-	std::array<wchar_t,512> wideDescription;
-	DXGetErrorDescription( hr,wideDescription.data(),wideDescription.size() );
+std::wstring Graphics::Exception::GetErrorDescription() const {
+	std::array<wchar_t, 512> wideDescription;
+	DXGetErrorDescription(hr, wideDescription.data(), wideDescription.size());
 	return wideDescription.data();
 }
 
-std::wstring Graphics::Exception::GetExceptionType() const
-{
+std::wstring Graphics::Exception::GetExceptionType() const {
 	return L"Chili Graphics Exception";
+}
+
+void Graphics::DrawLine(float x1, float y1, float x2, float y2, Color c) {
+	const float dx = x2 - x1;
+	const float dy = y2 - y1;
+
+	if (dy == 0.0f && dx == 0.0f) {
+		PutPixel(int(x1), int(y1), c);
+	} else if (abs(dy) > abs(dx)) {
+		if (dy < 0.0f) {
+			std::swap(x1, x2);
+			std::swap(y1, y2);
+		}
+
+		const float m = dx / dy;
+		float y = y1;
+		int lastIntY;
+		for (float x = x1; y < y2; y += 1.0f, x += m) {
+			lastIntY = int(y);
+			PutPixel(int(x), lastIntY, c);
+		}
+		if (int(y2) > lastIntY) {
+			PutPixel(int(x2), int(y2), c);
+		}
+	} else {
+		if (dx < 0.0f) {
+			std::swap(x1, x2);
+			std::swap(y1, y2);
+		}
+
+		const float m = dy / dx;
+		float x = x1;
+		int lastIntX;
+		for (float y = y1; x < x2; x += 1.0f, y += m) {
+			lastIntX = int(x);
+			PutPixel(lastIntX, int(y), c);
+		}
+		if (int(x2) > lastIntX) {
+			PutPixel(int(x2), int(y2), c);
+		}
+	}
+}
+
+void Graphics::DrawLineClamped(Vec2 p1, Vec2 p2, Color c) {
+	// Setup X
+	if (p1.x > p2.x) {
+		std::swap(p1, p2);
+	}
+	if (p1.x >= ScreenWidth) { return; }
+	if (p2.x < 0) { return; }
+
+	// Clamp Left
+	if (p1.x < 0) {
+		const float deltaX = p2.x - p1.x;
+		const float cutPercentage = -p1.x / deltaX;
+		p1 = Interpolate(p1, p2, cutPercentage);
+	}
+	// Clamp Right
+	if (p2.x >= ScreenWidth) {
+		const float deltaX = p2.x - p1.x;
+		const float cutPercentage = (ScreenWidth - 1 - p1.x) / deltaX;
+		p2 = Interpolate(p1, p2, cutPercentage);
+	}
+	// Setup Y
+	if (p1.y > p2.y) {
+		std::swap(p1, p2);
+	}
+	if (p1.y >= ScreenHeight) { return; }
+	if (p2.y < 0) { return; }
+
+	// Clamp Top
+	if (p1.y < 0) {
+		const float deltaY = p2.y - p1.y;
+		const float cutPercentage = -p1.y / deltaY;
+		p1 = Interpolate(p1, p2, cutPercentage);
+	}
+	// Clamp Bottom
+	if (p2.y >= ScreenHeight) {
+		const float deltaY = p2.y - p1.y;
+		const float cutPercentage = (ScreenHeight - 1 - p1.y) / deltaY;
+		p2 = Interpolate(p1, p2, cutPercentage);
+	}
+
+	DrawLine(p1.x, p1.y, p2.x, p2.y, c);
+}
+
+void Graphics::DrawCircle(Vei2 center, int radius, Color c) {
+	const int left = std::clamp(center.x - radius, 0, (int)ScreenWidth - 1);
+	const int right = std::clamp(center.x + radius, 0, (int)ScreenWidth - 1);
+	const int top = std::clamp(center.y - radius, 0, (int)ScreenHeight - 1);
+	const int bottom = std::clamp(center.y + radius, 0, (int)ScreenHeight - 1);
+	
+	for (int y = top; y <= bottom; y++) {
+		for (int x = left; x <= right; x++) {
+			Vec2 delta = { (float)center.x - x, (float)center.y - y};
+			const float distanceSqr = delta.LenSq();
+			if (distanceSqr < pow(radius, 2)) {
+				PutPixel(x, y, c);
+			}
+		}
+	}
+}
+
+void Graphics::DrawRectangle(int top, int left, int width, int height, Color c) {
+	for (int cy = 0; cy < height; cy++) {
+		for (int cx = 0; cx < width; cx++) {
+			PutPixel(left + cx, top + cy, c);
+		}
+	}
 }
