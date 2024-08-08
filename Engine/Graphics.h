@@ -60,6 +60,7 @@ public:
 	void DrawLine(float x1, float y1, float x2, float y2, Color c);
 	void DrawLineClamped(Vec2 p1, Vec2 p2, Color c);
 	void DrawCircle(Vei2 pos, int radius, Color c);
+	void DrawRectangle(int top, int left, int width, int height, Color c);
 	void PutPixel( int x,int y,Color c )
 	{
 		sysBuffer.PutPixel( x,y,c );
@@ -81,6 +82,6 @@ private:
 	D3D11_MAPPED_SUBRESOURCE							mappedSysBufferTexture;
 	Surface												sysBuffer;
 public:
-	static constexpr unsigned int ScreenWidth = 800u;
-	static constexpr unsigned int ScreenHeight = 600u;
+	static constexpr unsigned int ScreenWidth =900u;
+	static constexpr unsigned int ScreenHeight = 720u;
 };

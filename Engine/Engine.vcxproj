@@ -157,6 +157,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Raycaster.h" />
+    <ClInclude Include="RaycastingFpsRenderer.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Sound.h" />

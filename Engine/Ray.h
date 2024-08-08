@@ -2,6 +2,12 @@
 #include <optional>
 #include "Map.h"
 
+struct HitInfo {
+	std::optional<Vec2> hitPosition;
+	float hitDistance = std::numeric_limits<float>::infinity();
+	Color color;
+};
+
 class Ray {
 public:
 	Ray(Vec2 position, float radians)
@@ -41,9 +47,14 @@ public:
 		}
 
 		if (horizontalDistanceSqr < verticalDistanceSqr) {
-			hit = *hCollision;
+			hitInfo.hitPosition = *hCollision;
+			hitInfo.hitDistance = std::sqrt(horizontalDistanceSqr);
+			hitInfo.color = Colors::LightGray;
+
 		} else {
-			hit = *vCollision;
+			hitInfo.hitPosition = *vCollision;
+			hitInfo.hitDistance = std::sqrt(verticalDistanceSqr);
+			hitInfo.color = Colors::Gray;
 		}
 	}
 
@@ -120,10 +131,14 @@ public:
 	}
 
 	void Draw(const Map *pMap, Graphics& gfx, Color c) const {
-		if (hit.has_value()) {
-			Vec2 drawPos = Map::ToScreenSpace(pMap, hit.value());
-			gfx.DrawCircle(Vei2(drawPos), 3, Colors::Magenta);
+		if (hitInfo.hitPosition.has_value()) {
+			Vec2 drawPos = Map::ToScreenSpace(pMap, hitInfo.hitPosition.value());
+			gfx.DrawLineClamped(position, drawPos, c);
 		}
+	}
+
+	const HitInfo *GetHitInfo() const {
+		return &hitInfo;
 	}
 
 private:
@@ -131,7 +146,7 @@ private:
 	float angle;
 	Vec2 direction;
 	static constexpr int maxHits = 10;
-	std::optional<Vec2> hit;
+	HitInfo hitInfo;
 
 	bool isFacingUp = angle > PI;
 	bool isFacingDown = !isFacingUp;

@@ -413,3 +413,11 @@ void Graphics::DrawCircle(Vei2 center, int radius, Color c) {
 		}
 	}
 }
+
+void Graphics::DrawRectangle(int top, int left, int width, int height, Color c) {
+	for (int cy = 0; cy < height; cy++) {
+		for (int cx = 0; cx < width; cx++) {
+			PutPixel(left + cx, top + cy, c);
+		}
+	}
+}

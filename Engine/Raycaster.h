@@ -23,25 +23,19 @@ public:
 	}
 
 	void Draw(const Map *pMap, Graphics& gfx, Color c) {
-		const Vec2 position = pPlayer->GetPosition();
-		const float angle = pPlayer->GetAngle();
-		const float rayAngle1 = angle - FOV / 2;
-		const float rayAngle2 = angle + FOV / 2;
-		const Vec2 direction1 = { cos(rayAngle1), sin(rayAngle1) };
-		const Vec2 direction2 = { cos(rayAngle2), sin(rayAngle2) };
-		const float distance = 100.0f;
-
-		gfx.DrawLineClamped(position, position + direction1 * distance, c);
-		gfx.DrawLineClamped(position, position + direction2 * distance, c);
-
 		for (const Ray& r : rays) {
 			r.Draw(pMap, gfx, c);
 		}
 	}
+
+	const std::vector<Ray> *GetRays() const {
+		return &rays;
+	}
+
 private:
 	const Map *pMap;
 	Player *pPlayer;
 	const float FOV = MathUtilities::ToRadians(60.0f);
 	std::vector<Ray> rays;
-	const int nRays = 128;
+	const int nRays = Graphics::ScreenWidth;
 };
