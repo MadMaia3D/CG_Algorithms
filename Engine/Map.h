@@ -110,6 +110,8 @@ public:
 	int GetCellHeight() const { return cellHeight; }
 	int GetNRows() const { return nRows; }
 	int GetNColumns() const { return nColumns; }
+	int GetTotalWidth() const { return totalWidth; }
+	int GetTotalHeight() const { return totalHeight; }
 
 private:
 	/* ---------------- Auxiliary Drawing functions ---------------- */
