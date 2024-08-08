@@ -28,7 +28,7 @@ public:
 		const int cellWidth = pMap->GetCellWidth();
 		const int cellHeight = pMap->GetCellHeight();
 
-		const Vec2 origin = { position.x / (float)cellWidth , position.y / (float)cellWidth };
+		const Vec2 origin = Map::ToMapSpace(pMap, position);// { position.x / (float)cellWidth, position.y / (float)cellWidth };
 
 		float horizontalDistanceSqr = std::numeric_limits<float>::infinity();
 		float verticalDistanceSqr = std::numeric_limits<float>::infinity();
@@ -50,7 +50,7 @@ public:
 	std::optional<Vec2> CheckHorizontalCollisions(const Map *pMap) {
 		const int cellHeight = pMap->GetCellHeight();
 
-		const Vec2 origin = position / (float)cellHeight; // grid space
+		const Vec2 origin = Map::ToMapSpace(pMap, position); // position / (float)cellHeight; // grid space
 		Vec2 hHit1;
 		Vec2 hHit2;
 		const float tanTheta = tan(angle);
@@ -86,7 +86,7 @@ public:
 	std::optional<Vec2> CheckVerticalCollisions(const Map *pMap) {
 		const int cellWidth = pMap->GetCellWidth();
 
-		Vec2 origin = position / (float)cellWidth; // grid space
+		Vec2 origin = Map::ToMapSpace(pMap, position); // position / (float)cellWidth; // grid space
 		Vec2 vHit1;
 		Vec2 vHit2;
 		const float tanTheta = tan(angle);
@@ -121,7 +121,7 @@ public:
 
 	void Draw(const Map *pMap, Graphics& gfx, Color c) const {
 		if (hit.has_value()) {
-			Vec2 drawPos = { hit.value().x * pMap->GetCellWidth(), hit.value().y * pMap->GetCellHeight() };
+			Vec2 drawPos = Map::ToScreenSpace(pMap, hit.value()); // { hit.value().x * pMap->GetCellWidth(), hit.value().y * pMap->GetCellHeight() };
 			gfx.DrawCircle(Vei2(drawPos), 3, Colors::Magenta);
 		}
 	}
