@@ -43,6 +43,6 @@ private:
 	Vec2 position;
 	Vec2 direction = { 1.0f, 0.0f };
 	float angle = -3.14f / 2;
-	static constexpr float rotationSpeed = 2.0f;
-	static constexpr float walkSpeed = 100.0f;
+	static constexpr float rotationSpeed = 1.5f;
+	static constexpr float walkSpeed = 20.0f;
 };
