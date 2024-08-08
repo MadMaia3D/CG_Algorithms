@@ -38,7 +38,6 @@ public:
 	}
 	void Draw(Graphics& gfx, Color color) const {
 		gfx.DrawCircle((Vei2)position, 5, color);
-		//gfx.DrawLineClamped(position, position + direction * 250, color);
 	}
 private:
 	Vec2 position;
