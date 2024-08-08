@@ -1,7 +1,8 @@
 #pragma once
+#include <algorithm>
+#include <unordered_map>
 #include "Graphics.h"
 #include "Surface.h"
-#include <unordered_map>
 
 // hashing for Color
 namespace std {
@@ -64,16 +65,45 @@ public:
 	}
 
 	void Draw(Graphics &gfx) {
-		DrawCells(gfx);
+		DrawAllCells(gfx);
 		DrawLines(Colors::Black, gfx);
 	}
 
+	void PaintCell(Vei2 cell, Graphics &gfx, Color c) const {
+
+		int left = std::clamp(cell.x * cellWidth + position.x, 0, (int)gfx.ScreenWidth);
+		int top = std::clamp(cell.y * cellHeight + position.y, 0, (int)gfx.ScreenHeight);
+		int right = std::clamp(left + cellWidth, 0, (int)gfx.ScreenWidth);
+		int bottom = std::clamp(top + cellHeight, 0, (int)gfx.ScreenHeight);
+
+		for (int cy = top; cy < bottom; cy++) {
+			for (int cx = left; cx < right; cx++) {
+				gfx.PutPixel(cx, cy, c);
+			}
+		}
+	}
+
+	/* ---------------- Convert From Screen Space to Grid Space and Vice-Versa ---------------- */
+	static Vec2 ToMapSpace(const Map *pMap, Vec2 pos) {
+		pos -= (Vec2)pMap->GetPosition();
+		return { pos.x / pMap->GetCellHeight(), pos.y / pMap->GetCellWidth() };
+	}
+
+	static Vec2 ToScreenSpace(const Map *pMap, Vec2 pos) {
+		return Vec2(pos.x * pMap->GetCellHeight(), pos.y * pMap->GetCellWidth()) + (Vec2)pMap->GetPosition();
+	}
+
+	/* ---------------- Questions ---------------- */
 	bool HasWallAt(int x, int y) const {
 		const int index = y * nColumns + x;
 		return data[index] == CellType::Wall;
 	}
 
+	bool IsValidCell(Vec2 pos) {
+		return (pos.x > 0 && pos.x < nColumns && pos.y > 0 && pos.y < nRows);
+	}
 
+	/* ---------------- Getters and Setters ----------------*/
 	void SetPosition(Vei2 pos) { position = pos; }
 	Vei2 GetPosition() const { return position; }
 	int GetCellWidth() const { return cellWidth; }
@@ -82,6 +112,7 @@ public:
 	int GetNColumns() const { return nColumns; }
 
 private:
+	/* ---------------- Auxiliary Drawing functions ---------------- */
 	void DrawLines(Color color, Graphics &gfx) const {
 		for (int cy = 0; cy <= nRows; cy++) {
 			const int posY = cy * cellHeight;
@@ -97,8 +128,8 @@ private:
 		}
 	}
 
-	void DrawCell(int column, int row, Graphics &gfx) const {
-		int cellIndex = row * nColumns + column;
+	void DrawSingleCell(Vei2 cell, Graphics &gfx) const {
+		int cellIndex = cell.y * nColumns + cell.x;
 		Color c;
 
 		switch (data[cellIndex]) {
@@ -109,22 +140,17 @@ private:
 			c = { 48,48,48 };
 			break;
 		default:
-			c = Colors::Black;
+			c = Colors::Magenta;
 			break;
 		}
-		Vei2 topLeft = { column * cellWidth, row * cellHeight };
-		for (int cy = 0; cy < cellHeight; cy++) {
-			for (int cx = 0; cx < cellWidth; cx++) {
 
-				gfx.PutPixel(position.x + topLeft.x + cx, position.y + topLeft.y + cy, c);
-			}
-		}
+		PaintCell(cell, gfx, c);
 	}
 
-	void DrawCells(Graphics &gfx) const {
+	void DrawAllCells(Graphics &gfx) const {
 		for (int y = 0; y < nRows; y++) {
 			for (int x = 0; x < nColumns; x++) {
-				DrawCell(x, y, gfx);
+				DrawSingleCell({ x, y }, gfx);
 			}
 		}
 	}
