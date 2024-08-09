@@ -20,6 +20,7 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
+#include "TextureRenderer.h"
 
 Game::Game(MainWindow& wnd)
 	:
@@ -40,7 +41,7 @@ void Game::UpdateModel() {
 void Game::ComposeFrame() {
 	const Vec2 screenOffset = { Graphics::ScreenWidth / 2.0f ,Graphics::ScreenHeight / 2.0f };
 	constexpr float cameraSpeed = 600.0f;
-	constexpr float zoomSpeed = 5.0f;
+	constexpr float zoomSpeed = 0.25f;
 
 	const float deltaTime = timer.Mark();
 
@@ -49,10 +50,10 @@ void Game::ComposeFrame() {
 
 		switch (e.GetType()) {
 		case Mouse::Event::Type::WheelUp:
-			zoomLevel += zoomSpeed * zoomLevel * deltaTime;
+			zoomLevel += zoomSpeed * zoomLevel;
 			break;
 		case Mouse::Event::Type::WheelDown:
-			zoomLevel -= zoomSpeed * zoomLevel* deltaTime;
+			zoomLevel -= zoomSpeed * zoomLevel;
 			break;
 		default:
 			break;
@@ -75,25 +76,5 @@ void Game::ComposeFrame() {
 	zoomLevel = std::clamp(zoomLevel, 0.1f, 64.0f);
 	cameraPos += cameraInput / zoomLevel * cameraSpeed * deltaTime;
 
-
-	for (int sy = 0; sy < Graphics::ScreenHeight; sy++) {
-		for (int sx = 0; sx < Graphics::ScreenWidth; sx++) {
-			Vec2 result = { (float)sx, (float)sy };
-			result -= screenOffset;
-			result /= zoomLevel;
-			result += cameraPos;
-			result += Vec2{ 128, 128 };
-
-			if (result.x > 0.0f && result.x < 255.0f && result.y > 0.0f && result.y < 255.0f) {
-				result = result / 255.0f;
-				float sampleX = fmod(result.x, 1.0f);
-				float sampleY = fmod(result.y, 1.0f);
-				if (sampleX < 0) { sampleX += 1.0f; };
-				if (sampleY < 0) { sampleY += 1.0f; };
-				Color sampledColor = texture.GetPixel(int(sampleX * tWidth), int(sampleY * tHeight));
-
-				gfx.PutPixel(sx, sy, sampledColor);
-			}
-		}
-	}
+	RenderTexture(cameraPos, zoomLevel, texture, gfx, CLAMP_TO_EDGE_Y | CLAMP_TO_EDGE_X);
 }

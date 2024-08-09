@@ -46,8 +46,6 @@ private:
 	Timer timer;
 	Vec2 cameraPos = { 0.0f, 0.0f };
 	float zoomLevel = 2.0f;
-	Surface texture = Surface::FromFile(L"Textures/Nature.jpg");
-	const int tWidth = texture.GetWidth();
-	const int tHeight = texture.GetHeight();
+	Surface texture = Surface::FromFile(L"Textures/Nature_Marks.jpg");
 	/********************************/
 };
