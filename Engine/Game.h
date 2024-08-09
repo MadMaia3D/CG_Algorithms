@@ -23,6 +23,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
+#include "Timer.h"
 
 class Game
 {
@@ -42,5 +43,8 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
+	Timer timer;
+	Vec2 cameraPos = { 0.0f, 0.0f };
+	float zoomLevel = 2.0f;
 	/********************************/
 };

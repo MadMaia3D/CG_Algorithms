@@ -1,5 +1,5 @@
-/****************************************************************************************** 
- *	Chili DirectX Framework Version 16.07.20											  *	
+/******************************************************************************************
+ *	Chili DirectX Framework Version 16.07.20											  *
  *	Game.cpp																			  *
  *	Copyright 2016 PlanetChili.net <http://www.planetchili.net>							  *
  *																						  *
@@ -21,25 +21,70 @@
 #include "MainWindow.h"
 #include "Game.h"
 
-Game::Game( MainWindow& wnd )
+Game::Game(MainWindow& wnd)
 	:
-	wnd( wnd ),
-	gfx( wnd )
-{
+	wnd(wnd),
+	gfx(wnd) {
 }
 
-void Game::Go()
-{
-	gfx.BeginFrame();	
+void Game::Go() {
+	gfx.BeginFrame();
 	UpdateModel();
 	ComposeFrame();
 	gfx.EndFrame();
 }
 
-void Game::UpdateModel()
-{
+void Game::UpdateModel() {
 }
 
-void Game::ComposeFrame()
-{
+void Game::ComposeFrame() {
+	const Vec2 screenOffset = { Graphics::ScreenWidth / 2.0f ,Graphics::ScreenHeight / 2.0f };
+	constexpr float cameraSpeed = 600.0f;
+	constexpr float zoomSpeed = 5.0f;
+
+	const float deltaTime = timer.Mark();
+
+	while (!wnd.mouse.IsEmpty()) {
+		Mouse::Event e = wnd.mouse.Read();
+
+		switch (e.GetType()) {
+		case Mouse::Event::Type::WheelUp:
+			zoomLevel += zoomSpeed * zoomLevel * deltaTime;
+			break;
+		case Mouse::Event::Type::WheelDown:
+			zoomLevel -= zoomSpeed * zoomLevel* deltaTime;
+			break;
+		default:
+			break;
+		}
+	}
+
+	Vec2 cameraInput = { 0,0 };
+	if (wnd.kbd.KeyIsPressed('A')) {
+		cameraInput.x -= 1.0f;
+	}
+	if (wnd.kbd.KeyIsPressed('D')) {
+		cameraInput.x += 1.0f;
+	}
+	if (wnd.kbd.KeyIsPressed('W')) {
+		cameraInput.y -= 1.0f;
+	}
+	if (wnd.kbd.KeyIsPressed('S')) {
+		cameraInput.y += 1.0f;
+	}
+	zoomLevel = std::clamp(zoomLevel, 0.1f, 4.0f);
+	cameraPos += cameraInput / zoomLevel * cameraSpeed * deltaTime;
+
+
+	for (int sy = 0; sy < Graphics::ScreenHeight; sy++) {
+		for (int sx = 0; sx < Graphics::ScreenWidth; sx++) {
+			Vec2 result = { (float)sx, (float)sy };
+			result -= screenOffset;
+			result /= zoomLevel;
+			result += cameraPos;
+			result += Vec2{ 128, 128 };
+
+			gfx.PutPixel(sx, sy, Color((int)result.x, (int)result.y, 0));
+		}
+	}
 }
