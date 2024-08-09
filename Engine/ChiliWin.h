@@ -21,6 +21,7 @@
 #pragma once
 
 // target Windows 7 or later
+#ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0601
 #include <sdkddkver.h>
 // The following #defines disable a bunch of unused windows stuff. If you 
@@ -68,3 +69,5 @@
 #define STRICT
 
 #include <Windows.h>
+
+#endif
