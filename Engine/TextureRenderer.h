@@ -11,6 +11,8 @@ struct CameraTransform {
 	float zoomLevel = 2.0f;
 };
 
+void TransformCamera(CameraTransform *pCam, Vec2 deltaPosition, float deltaZoom);
+
 Vec2 TransformToCameraSpace(Vec2 point, const CameraTransform *ct);
 
 void RenderTexture(CameraTransform &ct, const Surface &texture, Graphics& gfx, unsigned int options = 0);

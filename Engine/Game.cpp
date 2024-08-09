@@ -38,28 +38,28 @@ void Game::UpdateModel() {
 }
 
 void Game::ComposeFrame() {
-	const Vec2 screenOffset = { Graphics::ScreenWidth / 2.0f ,Graphics::ScreenHeight / 2.0f };
 	constexpr float cameraSpeed = 600.0f;
 	constexpr float zoomSpeed = 0.25f;
 
 	const float deltaTime = timer.Mark();
+
+	Vec2 cameraInput = { 0,0 };
+	float deltaZoom = 0.0f;
 
 	while (!wnd.mouse.IsEmpty()) {
 		Mouse::Event e = wnd.mouse.Read();
 
 		switch (e.GetType()) {
 		case Mouse::Event::Type::WheelUp:
-			ct.zoomLevel += zoomSpeed * ct.zoomLevel;
+			deltaZoom += zoomSpeed;
 			break;
 		case Mouse::Event::Type::WheelDown:
-			ct.zoomLevel -= zoomSpeed * ct.zoomLevel;
+			deltaZoom -= zoomSpeed;
 			break;
 		default:
 			break;
 		}
 	}
-
-	Vec2 cameraInput = { 0,0 };
 	if (wnd.kbd.KeyIsPressed('A')) {
 		cameraInput.x -= 1.0f;
 	}
@@ -72,8 +72,7 @@ void Game::ComposeFrame() {
 	if (wnd.kbd.KeyIsPressed('S')) {
 		cameraInput.y += 1.0f;
 	}
-	ct.zoomLevel = std::clamp(ct.zoomLevel, 0.1f, 64.0f);
-	ct.cameraPos += cameraInput / ct.zoomLevel * cameraSpeed * deltaTime;
+	TransformCamera(&ct, cameraInput * cameraSpeed * deltaTime, deltaZoom);
 
 	RenderTexture(ct, texture, gfx, CLAMP_TO_BORDER_Y | CLAMP_TO_BORDER_X);
 }

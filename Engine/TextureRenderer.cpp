@@ -1,5 +1,11 @@
 #include "TextureRenderer.h"
 
+void TransformCamera(CameraTransform * pCam, Vec2 deltaPosition, float deltaZoom) {
+	pCam->zoomLevel += deltaZoom * pCam->zoomLevel;
+	pCam->zoomLevel = std::clamp(pCam->zoomLevel, 0.1f, 64.0f);
+	pCam->cameraPos += deltaPosition / pCam->zoomLevel;
+}
+
 Vec2 TransformToCameraSpace(Vec2 point, const CameraTransform * ct) {
 	constexpr Vec2 screenOffset(Graphics::ScreenWidth / 2.0f, Graphics::ScreenHeight / 2.0f);
 	point -= screenOffset;
