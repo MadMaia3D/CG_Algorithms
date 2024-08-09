@@ -47,7 +47,7 @@ void Game::UpdateModel() {
 }
 
 void Game::ComposeFrame() {
-	RederRayscastAsFPS(&raycaster, gfx);
+	RenderRayscastAsFPS(&raycaster, gfx);
 
 	map.Draw(gfx);
 	player.Draw(gfx, Colors::Red);

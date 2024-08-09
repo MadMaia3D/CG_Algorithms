@@ -2,11 +2,11 @@
 #include "Raycaster.h"
 
 
-#define RECTILINEAR_LENS 0b0000
-#define FISH_EYE_LENS 0b0001
+#define RENDER_RECTILINEAR_LENS 0b0000
+#define RENDER_FISH_EYE_LENS 0b0001
 
 
-void RederRayscastAsFPS(const Raycaster *pCaster, Graphics& gfx, unsigned int renderOptions = RECTILINEAR_LENS) {
+void RenderRayscastAsFPS(const Raycaster *pCaster, Graphics& gfx, unsigned int renderOptions = 0u) {
 	const std::vector<Ray> *pRays = pCaster->GetRays();
 
 	const int nRays = pRays->size();
@@ -25,7 +25,7 @@ void RederRayscastAsFPS(const Raycaster *pCaster, Graphics& gfx, unsigned int re
 		const HitInfo *pHit = (*pRays)[i].GetHitInfo();
 
 		float hitDistance = pHit->hitDistance;
-		if (!(renderOptions & FISH_EYE_LENS)) {
+		if (!(renderOptions & RENDER_FISH_EYE_LENS)) {
 			hitDistance *= cos(viewAngle - pHit->angleRad);
 		}
 		const float projWallHeight = (wallHeight / hitDistance) * focalLength;
