@@ -72,7 +72,7 @@ void Game::ComposeFrame() {
 	if (wnd.kbd.KeyIsPressed('S')) {
 		cameraInput.y += 1.0f;
 	}
-	zoomLevel = std::clamp(zoomLevel, 0.1f, 4.0f);
+	zoomLevel = std::clamp(zoomLevel, 0.1f, 64.0f);
 	cameraPos += cameraInput / zoomLevel * cameraSpeed * deltaTime;
 
 
