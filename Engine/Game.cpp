@@ -84,7 +84,14 @@ void Game::ComposeFrame() {
 			result += cameraPos;
 			result += Vec2{ 128, 128 };
 
-			gfx.PutPixel(sx, sy, Color((int)result.x, (int)result.y, 0));
+			result = result / 255.0f;
+			float sampleX = fmod(result.x, 1.0f);
+			float sampleY = fmod(result.y, 1.0f);
+			if (sampleX < 0) { sampleX += 1.0f; };
+			if (sampleY < 0) { sampleY += 1.0f; };
+			Color sampledColor = texture.GetPixel(int(sampleX * tWidth), int(sampleY * tHeight));
+
+			gfx.PutPixel(sx, sy, sampledColor);
 		}
 	}
 }
