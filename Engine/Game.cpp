@@ -29,7 +29,7 @@ Game::Game(MainWindow& wnd)
 	gfx(wnd),
 	map({ 20, 20 }, 5, 5, L"Maps/test2.bmp"),
 	player({110,80}),
-	raycaster(&map, &player)
+	raycaster(&map, &player, 60.0f)
 {
 }
 
@@ -47,7 +47,7 @@ void Game::UpdateModel() {
 }
 
 void Game::ComposeFrame() {
-	RenderRaycasting(&raycaster, gfx);
+	RederRayscastAsFPS(&raycaster, gfx);
 
 	map.Draw(gfx, false);
 	player.Draw(gfx, Colors::Red);

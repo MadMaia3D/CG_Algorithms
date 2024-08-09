@@ -3,10 +3,11 @@
 
 class Raycaster {
 public:
-	Raycaster(const Map *pMap, Player *pPlayer)
+	Raycaster(const Map *pMap, Player *pPlayer, float fov_deegre)
 		:
 		pMap(pMap),
-		pPlayer(pPlayer) {
+		pPlayer(pPlayer),
+		FOV(MathUtilities::ToRadians(fov_deegre)) {
 		rays.reserve(nRays);
 	}
 
@@ -32,10 +33,18 @@ public:
 		return &rays;
 	}
 
+	float GetAngle() const {
+		return pPlayer->GetAngle();
+	}
+
+	float GetFOV() const {
+		return FOV;
+	}
+
 private:
 	const Map *pMap;
 	Player *pPlayer;
-	const float FOV = MathUtilities::ToRadians(60.0f);
+	const float FOV;
 	std::vector<Ray> rays;
 	const int nRays = Graphics::ScreenWidth;
 };

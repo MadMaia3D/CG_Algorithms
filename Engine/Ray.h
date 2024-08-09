@@ -3,7 +3,9 @@
 #include "Map.h"
 
 struct HitInfo {
+	Vec2 origin;
 	std::optional<Vec2> hitPosition;
+	float angleRad;
 	float hitDistance = std::numeric_limits<float>::infinity();
 	Color color;
 };
@@ -45,6 +47,9 @@ public:
 		if (vHasValue) {
 			verticalDistanceSqr = Vec2(origin - vCollision.value()).LenSq();
 		}
+
+		hitInfo.origin = position;
+		hitInfo.angleRad = angle;
 
 		if (horizontalDistanceSqr < verticalDistanceSqr) {
 			hitInfo.hitPosition = *hCollision;
