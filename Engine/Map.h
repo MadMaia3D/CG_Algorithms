@@ -14,6 +14,10 @@ namespace std {
 	};
 }
 
+#define MAP_DRAW_DEFAULT = 0b0000
+#define MAP_DRAW_CELLS_BORDERS 0b0001
+#define MAP_DRAW_TRANSPARENT 0b0010
+
 class Map {
 private:
 	enum class CellType {
@@ -64,9 +68,9 @@ public:
 		}
 	}
 
-	void Draw(Graphics &gfx, bool drawBorders = true) {
-		DrawAllCells(gfx);
-		if (drawBorders) {
+	void Draw(Graphics &gfx, unsigned int drawOptions = 0) const {
+		DrawAllCells(gfx, drawOptions);
+		if (drawOptions & MAP_DRAW_CELLS_BORDERS) {
 			DrawLines(Colors::Black, gfx);
 		}
 	}
@@ -132,11 +136,16 @@ private:
 		}
 	}
 
-	void DrawSingleCell(Vei2 cell, Graphics &gfx) const {
+	void DrawSingleCell(Vei2 cell, Graphics &gfx, unsigned int drawOptions) const {
 		int cellIndex = cell.y * nColumns + cell.x;
-		Color c;
+		const CellType cellType = data[cellIndex];
 
-		switch (data[cellIndex]) {
+		if ((drawOptions & MAP_DRAW_TRANSPARENT) && cellType != CellType::Wall) {
+			return;
+		}
+
+		Color c;
+		switch (cellType) {
 		case CellType::Empty:
 			c = { 224,224,224 };
 			break;
@@ -148,13 +157,15 @@ private:
 			break;
 		}
 
+		
+
 		PaintCell(cell, gfx, c);
 	}
 
-	void DrawAllCells(Graphics &gfx) const {
+	void DrawAllCells(Graphics &gfx, unsigned drawOptions) const {
 		for (int y = 0; y < nRows; y++) {
 			for (int x = 0; x < nColumns; x++) {
-				DrawSingleCell({ x, y }, gfx);
+				DrawSingleCell({ x, y }, gfx, drawOptions);
 			}
 		}
 	}

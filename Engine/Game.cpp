@@ -49,7 +49,7 @@ void Game::UpdateModel() {
 void Game::ComposeFrame() {
 	RederRayscastAsFPS(&raycaster, gfx);
 
-	map.Draw(gfx, false);
+	map.Draw(gfx);
 	player.Draw(gfx, Colors::Red);
 	raycaster.Draw(&map, gfx, Colors::Red);
 }
