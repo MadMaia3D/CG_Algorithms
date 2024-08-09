@@ -20,7 +20,6 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
-#include "TextureRenderer.h"
 
 Game::Game(MainWindow& wnd)
 	:
@@ -50,10 +49,10 @@ void Game::ComposeFrame() {
 
 		switch (e.GetType()) {
 		case Mouse::Event::Type::WheelUp:
-			zoomLevel += zoomSpeed * zoomLevel;
+			ct.zoomLevel += zoomSpeed * ct.zoomLevel;
 			break;
 		case Mouse::Event::Type::WheelDown:
-			zoomLevel -= zoomSpeed * zoomLevel;
+			ct.zoomLevel -= zoomSpeed * ct.zoomLevel;
 			break;
 		default:
 			break;
@@ -73,8 +72,8 @@ void Game::ComposeFrame() {
 	if (wnd.kbd.KeyIsPressed('S')) {
 		cameraInput.y += 1.0f;
 	}
-	zoomLevel = std::clamp(zoomLevel, 0.1f, 64.0f);
-	cameraPos += cameraInput / zoomLevel * cameraSpeed * deltaTime;
+	ct.zoomLevel = std::clamp(ct.zoomLevel, 0.1f, 64.0f);
+	ct.cameraPos += cameraInput / ct.zoomLevel * cameraSpeed * deltaTime;
 
-	RenderTexture(cameraPos, zoomLevel, texture, gfx, CLAMP_TO_EDGE_Y | CLAMP_TO_EDGE_X);
+	RenderTexture(ct, texture, gfx, CLAMP_TO_BORDER_Y | CLAMP_TO_BORDER_X);
 }
