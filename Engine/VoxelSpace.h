@@ -4,8 +4,9 @@
 struct Camera {
 	Vec2 pos;
 	float zfar = 512.0f;
-	float height = 200.0f;
+	float height = 100.0f;
 	float angle = -PI/2;
+	float pitch = 250.0f;
 };
 
 struct MapData {

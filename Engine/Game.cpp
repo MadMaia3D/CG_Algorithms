@@ -42,8 +42,9 @@ void Game::Go() {
 void Game::UpdateModel() {
 	const float deltaTime = timer.Mark();
 	constexpr float moveSpeed = 150.0f;
-	constexpr float rotationSpeed = 1.2f;
+	constexpr float rotationSpeed = 1.4f;
 	constexpr float liftSpeed = 120.0f;
+	constexpr float pitchSpeed = 500.0f;
 
 	if (wnd.kbd.KeyIsPressed('W')) {
 		cam.pos.x += cos(cam.angle) * moveSpeed * deltaTime;
@@ -59,6 +60,12 @@ void Game::UpdateModel() {
 	if (wnd.kbd.KeyIsPressed('D')) {
 		cam.angle += rotationSpeed * deltaTime;
 	}
+	if (wnd.kbd.KeyIsPressed('Q')) {
+		cam.pitch -= pitchSpeed * deltaTime;
+	}
+	if (wnd.kbd.KeyIsPressed('E')) {
+		cam.pitch += pitchSpeed * deltaTime;
+	}
 	if (wnd.kbd.KeyIsPressed(VK_CONTROL)) {
 		cam.height -= liftSpeed * deltaTime;
 	}
@@ -68,5 +75,10 @@ void Game::UpdateModel() {
 }
 
 void Game::ComposeFrame() {
+	for (int y = 0; y < Graphics::ScreenHeight; y++) {
+		for (int x = 0; x < Graphics::ScreenWidth; x++) {
+			gfx.PutPixel(x, y, {128,200,255});
+		}
+	}
 	RenderVoxelMap(&mapData, &cam, gfx);
 }
