@@ -28,7 +28,7 @@ void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx)
 				}
 
 			int rawHeight = heightMap.GetPixel((int)currentMapPos.x, (int)currentMapPos.y).GetR();
-			int heightOnScreen = int((scaleFactor - rawHeight) * scaleFactor / z);
+			int heightOnScreen = int((cam.height - rawHeight) * scaleFactor / z);
 
 			if (heightOnScreen < 0) { heightOnScreen = 0; }
 			if (heightOnScreen >= Graphics::ScreenHeight) { heightOnScreen = Graphics::ScreenHeight - 1; }

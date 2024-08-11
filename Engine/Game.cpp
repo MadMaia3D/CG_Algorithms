@@ -54,6 +54,12 @@ void Game::UpdateModel()
 	if (wnd.kbd.KeyIsPressed('D')) {
 		cam.pos.x += 2.0f;
 	}
+	if (wnd.kbd.KeyIsPressed(VK_CONTROL)) {
+		cam.height -= 2.0f;
+	}
+	if (wnd.kbd.KeyIsPressed(VK_SPACE)) {
+		cam.height += 2.0f;
+	}
 }
 
 void Game::ComposeFrame()
