@@ -3,7 +3,7 @@
 
 struct Camera {
 	Vec2 pos;
-	float zfar = 512.0f;
+	float zfar = 2048.0f;
 	float height = 200.0f;
 	float angle = -PI/2;
 };

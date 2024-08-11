@@ -14,7 +14,7 @@ void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx)
 	// calculate camera front and right vectors
 	const Vec2 cameraFront = Vec2(cos(cam.angle), sin(cam.angle));
 	const Vec2 cameraRight = GetRotate90Clockwise(cameraFront);
-	
+
 	// use cam position plus camera fron and right vectors to calculate view far left and far right
 	const Vec2 lPoint = cam.pos + cameraFront * cam.zfar + cameraRight * cam.zfar;
 	const Vec2 rPoint = cam.pos + cameraFront * cam.zfar - cameraRight * cam.zfar;
@@ -29,12 +29,10 @@ void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx)
 		for (int z = 1; z < cam.zfar; z++) {
 			Vec2 currentMapPos = cam.pos + deltaY * (float)z;
 
-			if (!IsBetween((int)currentMapPos.x, 0, (int)heightMap.GetWidth())) {
-				continue;
-			} else
-				if (!IsBetween((int)currentMapPos.y, 0, (int)heightMap.GetHeight())) {
-					continue;
-				}
+			while (currentMapPos.x < 0.0f) { currentMapPos.x += heightMap.GetWidth(); }
+			while (currentMapPos.x >= heightMap.GetWidth()) { currentMapPos.x -= heightMap.GetWidth(); }
+			while (currentMapPos.y < 0.0f) { currentMapPos.y += heightMap.GetHeight(); }
+			while (currentMapPos.y >= heightMap.GetHeight()) { currentMapPos.y -= heightMap.GetHeight(); }
 
 			int rawHeight = heightMap.GetPixel((int)currentMapPos.x, (int)currentMapPos.y).GetR();
 			int heightOnScreen = int((cam.height - rawHeight) * scaleFactor / z);
