@@ -8,8 +8,8 @@ struct Camera {
 };
 
 struct MapData {
-	Surface *pHeightMap;
-	Surface *pColorMap;
+	const Surface *pHeightMap;
+	const Surface *pColorMap;
 };
 
 #define EXCLUSIVE_LOWER 0b0001
@@ -26,4 +26,4 @@ bool IsBetween(T value, T lowerLimit, T upperLimit, int options = EXCLUSIVE_LOWE
 	return true;
 }
 
-void TestRender(const Surface &heightMap, const Surface& colorMap, int wResolution, Graphics& gfx);
+void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx);

@@ -28,6 +28,8 @@ Game::Game( MainWindow& wnd )
 	hMap(Surface::FromFile(L"Textures/D1.png")),
 	cMap(Surface::FromFile(L"Textures/C1W.png"))
 {
+	mapData.pHeightMap = &hMap;
+	mapData.pColorMap = &cMap;
 }
 
 void Game::Go()
@@ -40,9 +42,21 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+	if (wnd.kbd.KeyIsPressed('W')) {
+		cam.pos.y -= 2.0f;
+	}
+	if (wnd.kbd.KeyIsPressed('S')) {
+		cam.pos.y += 2.0f;
+	}
+	if (wnd.kbd.KeyIsPressed('A')) {
+		cam.pos.x -= 2.0f;
+	}
+	if (wnd.kbd.KeyIsPressed('D')) {
+		cam.pos.x += 2.0f;
+	}
 }
 
 void Game::ComposeFrame()
 {
-	TestRender(hMap, cMap, 800, gfx);
+	RenderVoxelMap(&mapData, &cam, gfx);
 }

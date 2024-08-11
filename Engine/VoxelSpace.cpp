@@ -1,10 +1,14 @@
 #include "VoxelSpace.h"
 
-void TestRender(const Surface & heightMap, const Surface & colorMap, int wResolution, Graphics & gfx) {
-	const Camera cam = { { 512, 512 }, 400, 200 };
+void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx) {
+	const Surface &heightMap = *pMapData->pHeightMap;
+	const Surface &colorMap = *pMapData->pColorMap;
+	const Camera &cam = *pCam;
+	const int wResolution = gfx.ScreenWidth;
+	constexpr float scaleFactor = 200.0f;
+
 	const Vec2 lPoint = { cam.pos.x - cam.zfar, cam.pos.y - cam.zfar };
 	const Vec2 rPoint = { cam.pos.x + cam.zfar, cam.pos.y - cam.zfar };
-	constexpr float scaleFactor = 200.0f;
 
 	const Vec2 deltaX = (rPoint - lPoint) / (float)wResolution;
 
