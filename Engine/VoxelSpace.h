@@ -3,8 +3,9 @@
 
 struct Camera {
 	Vec2 pos;
-	float zfar;
-	float height;
+	float zfar = 512.0f;
+	float height = 200.0f;
+	float angle = -PI/2;
 };
 
 struct MapData {
@@ -26,4 +27,5 @@ bool IsBetween(T value, T lowerLimit, T upperLimit, int options = EXCLUSIVE_LOWE
 	return true;
 }
 
+Vec2 GetRotate90Clockwise(Vec2 vector);
 void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx);

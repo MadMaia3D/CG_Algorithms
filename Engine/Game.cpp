@@ -43,16 +43,18 @@ void Game::Go()
 void Game::UpdateModel()
 {
 	if (wnd.kbd.KeyIsPressed('W')) {
-		cam.pos.y -= 2.0f;
+		cam.pos.x += cos(cam.angle);
+		cam.pos.y += sin(cam.angle);
 	}
 	if (wnd.kbd.KeyIsPressed('S')) {
-		cam.pos.y += 2.0f;
+		cam.pos.x -= cos(cam.angle);
+		cam.pos.y -= sin(cam.angle);
 	}
 	if (wnd.kbd.KeyIsPressed('A')) {
-		cam.pos.x -= 2.0f;
+		cam.angle -= 0.02f;
 	}
 	if (wnd.kbd.KeyIsPressed('D')) {
-		cam.pos.x += 2.0f;
+		cam.angle += 0.02f;
 	}
 	if (wnd.kbd.KeyIsPressed(VK_CONTROL)) {
 		cam.height -= 2.0f;

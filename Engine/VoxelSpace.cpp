@@ -1,14 +1,23 @@
 #include "VoxelSpace.h"
 
+Vec2 GetRotate90Clockwise(Vec2 vector) {
+	return { vector.y, -vector.x };
+}
+
 void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx) {
 	const Surface &heightMap = *pMapData->pHeightMap;
 	const Surface &colorMap = *pMapData->pColorMap;
 	const Camera &cam = *pCam;
 	const int wResolution = gfx.ScreenWidth;
-	constexpr float scaleFactor = 200.0f;
+	constexpr float scaleFactor = 500.0f;
 
-	const Vec2 lPoint = { cam.pos.x - cam.zfar, cam.pos.y - cam.zfar };
-	const Vec2 rPoint = { cam.pos.x + cam.zfar, cam.pos.y - cam.zfar };
+	// calculate camera front and right vectors
+	const Vec2 cameraFront = Vec2(cos(cam.angle), sin(cam.angle));
+	const Vec2 cameraRight = GetRotate90Clockwise(cameraFront);
+	
+	// use cam position plus camera fron and right vectors to calculate view far left and far right
+	const Vec2 lPoint = cam.pos + cameraFront * cam.zfar + cameraRight * cam.zfar;
+	const Vec2 rPoint = cam.pos + cameraFront * cam.zfar - cameraRight * cam.zfar;
 
 	const Vec2 deltaX = (rPoint - lPoint) / (float)wResolution;
 

@@ -46,6 +46,6 @@ private:
 	const Surface hMap;
 	const Surface cMap;
 	MapData mapData;
-	Camera cam = { { 512, 512 }, 512, 200 };
+	Camera cam = { { 512, 512 }};
 	/********************************/
 };
