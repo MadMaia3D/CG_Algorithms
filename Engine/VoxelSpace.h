@@ -1,39 +1,29 @@
 #pragma once
-#include "Surface.h"
-#include "Vector2.h"
+#include "Graphics.h"
 
 struct Camera {
 	Vec2 pos;
 	float zfar;
+	float height;
 };
 
-void TestRender(const Surface &heightMap, const Surface& colorMap, int wResolution, Graphics& gfx) {
-	const Camera cam = { {512, 512}, 512 };
-	const Vec2 lPoint = { cam.pos.x - cam.zfar, cam.pos.y - cam.zfar };
-	const Vec2 rPoint = { cam.pos.x + cam.zfar, cam.pos.y - cam.zfar };
+struct MapData {
+	Surface *pHeightMap;
+	Surface *pColorMap;
+};
 
-	const Vec2 deltaX = (rPoint - lPoint) / (float)wResolution;
+#define EXCLUSIVE_LOWER 0b0001
+#define EXCLUSIVE_UPPER 0b0010
+#define INCLUSIVE_LOWER 0b0100
+#define INCLUSIVE_UPPER 0b1000
 
-	for (int i = 0; i < wResolution; i++) {
-		Vec2 target = lPoint + deltaX * (float)i;
-		Vec2 deltaY = (target - cam.pos) / cam.zfar;
-
-		int maxHeight = Graphics::ScreenHeight - 1;
-		for (int z = 1; z < cam.zfar; z++) {
-			Vec2 currentPos = cam.pos + deltaY * (float)z;
-
-			int currentHeight = 400 - heightMap.GetPixel((int)currentPos.x, (int)currentPos.y).GetR();
-
-			if (currentHeight < 0) { currentHeight = 0; }
-			if (currentHeight >= Graphics::ScreenHeight) { currentHeight = Graphics::ScreenHeight - 1; }
-
-			if (currentHeight < maxHeight) {
-				Color color = colorMap.GetPixel((int)currentPos.x, (int)currentPos.y);
-				for (int h = currentHeight; h < maxHeight; h++) {
-					gfx.PutPixel(i, h, color);
-				}
-				maxHeight = currentHeight;
-			}
-		}
-	}
+template <typename T>
+bool IsBetween(T value, T lowerLimit, T upperLimit, int options = EXCLUSIVE_LOWER | EXCLUSIVE_UPPER) {
+	if (value < lowerLimit) { return false; }
+	if (!(options & INCLUSIVE_LOWER) && value == lowerLimit) { return false; }
+	if (value > upperLimit) { return false; }
+	if (!(options & INCLUSIVE_UPPER) && value == upperLimit) { return false; }
+	return true;
 }
+
+void TestRender(const Surface &heightMap, const Surface& colorMap, int wResolution, Graphics& gfx);

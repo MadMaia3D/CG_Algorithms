@@ -20,8 +20,6 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
-#include "Surface.h"
-#include "VoxelSpace.h"
 
 Game::Game( MainWindow& wnd )
 	:

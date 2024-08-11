@@ -23,7 +23,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
-#include "Surface.h"
+#include "VoxelSpace.h"
 
 class Game
 {
@@ -45,5 +45,6 @@ private:
 	/*  User Variables              */
 	const Surface hMap;
 	const Surface cMap;
+	MapData mapData;
 	/********************************/
 };
