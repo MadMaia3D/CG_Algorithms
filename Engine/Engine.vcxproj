@@ -159,6 +159,7 @@
     <ClInclude Include="Surface.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vector2.h" />
+    <ClInclude Include="VoxelSpace.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="COMInitializer.cpp" />

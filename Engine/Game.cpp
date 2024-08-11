@@ -21,11 +21,14 @@
 #include "MainWindow.h"
 #include "Game.h"
 #include "Surface.h"
+#include "VoxelSpace.h"
 
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
-	gfx( wnd )
+	gfx( wnd ),
+	hMap(Surface::FromFile(L"Textures/D1.png")),
+	cMap(Surface::FromFile(L"Textures/C1W.png"))
 {
 }
 
@@ -43,4 +46,5 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
+	TestRender(hMap, cMap, 800, gfx);
 }
