@@ -47,31 +47,32 @@ void Game::UpdateModel() {
 	constexpr float pitchSpeed = 500.0f;
 
 	if (wnd.kbd.KeyIsPressed('W')) {
-		cam.pos.x += cos(cam.angle) * moveSpeed * deltaTime;
-		cam.pos.y += sin(cam.angle) * moveSpeed * deltaTime;
+		cam.target_pos.x += cos(cam.angle) * moveSpeed * deltaTime;
+		cam.target_pos.y += sin(cam.angle) * moveSpeed * deltaTime;
 	}
 	if (wnd.kbd.KeyIsPressed('S')) {
-		cam.pos.x -= cos(cam.angle) * moveSpeed * deltaTime;
-		cam.pos.y -= sin(cam.angle) * moveSpeed * deltaTime;
+		cam.target_pos.x -= cos(cam.angle) * moveSpeed * deltaTime;
+		cam.target_pos.y -= sin(cam.angle) * moveSpeed * deltaTime;
 	}
 	if (wnd.kbd.KeyIsPressed('A')) {
-		cam.angle -= rotationSpeed * deltaTime;
+		cam.target_angle -= rotationSpeed * deltaTime;
 	}
 	if (wnd.kbd.KeyIsPressed('D')) {
-		cam.angle += rotationSpeed * deltaTime;
+		cam.target_angle += rotationSpeed * deltaTime;
 	}
 	if (wnd.kbd.KeyIsPressed('Q')) {
-		cam.pitch -= pitchSpeed * deltaTime;
+		cam.target_pitch -= pitchSpeed * deltaTime;
 	}
 	if (wnd.kbd.KeyIsPressed('E')) {
-		cam.pitch += pitchSpeed * deltaTime;
+		cam.target_pitch += pitchSpeed * deltaTime;
 	}
 	if (wnd.kbd.KeyIsPressed(VK_CONTROL)) {
-		cam.height -= liftSpeed * deltaTime;
+		cam.target_height -= liftSpeed * deltaTime;
 	}
 	if (wnd.kbd.KeyIsPressed(VK_SPACE)) {
-		cam.height += liftSpeed * deltaTime;
+		cam.target_height += liftSpeed * deltaTime;
 	}
+	UpdateCamera(&cam, deltaTime);
 }
 
 void Game::ComposeFrame() {
