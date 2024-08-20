@@ -1,6 +1,6 @@
 #include "VoxelSpace.h"
 
-Vec2 GetRotate90Clockwise(Vec2 vector) {
+Vec2 GetRotated90Clockwise(Vec2 vector) {
 	return { vector.y, -vector.x };
 }
 
@@ -13,7 +13,7 @@ void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx)
 
 	// calculate camera front and right vectors
 	const Vec2 cameraFront = Vec2(cos(cam.angle), sin(cam.angle));
-	const Vec2 cameraRight = GetRotate90Clockwise(cameraFront);
+	const Vec2 cameraRight = GetRotated90Clockwise(cameraFront);
 
 	// use cam position plus camera fron and right vectors to calculate view far left and far right
 	const Vec2 lPoint = cam.pos + cameraFront * cam.zfar + cameraRight * cam.zfar;

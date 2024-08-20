@@ -28,5 +28,5 @@ bool IsBetween(T value, T lowerLimit, T upperLimit, int options = EXCLUSIVE_LOWE
 	return true;
 }
 
-Vec2 GetRotate90Clockwise(Vec2 vector);
+Vec2 GetRotated90Clockwise(Vec2 vector);
 void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx);
