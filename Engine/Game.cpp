@@ -73,6 +73,7 @@ void Game::UpdateModel() {
 		cam.target_height += liftSpeed * deltaTime;
 	}
 	UpdateCamera(&cam, deltaTime);
+	PreventUndergroundCamera(&cam, &mapData);
 }
 
 void Game::ComposeFrame() {

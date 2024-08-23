@@ -26,6 +26,8 @@ struct MapData {
 
 void UpdateCamera(Camera *pCam, float deltaTime);
 
+void PreventUndergroundCamera(Camera *pCam, MapData *pMap);
+
 #define EXCLUSIVE_LOWER 0b0001
 #define EXCLUSIVE_UPPER 0b0010
 #define INCLUSIVE_LOWER 0b0100

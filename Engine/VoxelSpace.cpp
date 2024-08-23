@@ -7,6 +7,23 @@ void UpdateCamera(Camera * pCam, float deltaTime) {
 	pCam->pitch = Interpolate(pCam->pitch, pCam->target_pitch, 1.0f - exp(-deltaTime * pCam->pitch_acceleration));
 }
 
+void PreventUndergroundCamera(Camera * pCam, MapData * pMapData) {
+	Vec2 currentMapPos = pCam->pos;
+	const Surface &heightMap = *pMapData->pHeightMap;
+
+	while (currentMapPos.x < 0.0f) { currentMapPos.x += heightMap.GetWidth(); }
+	while (currentMapPos.x >= heightMap.GetWidth()) { currentMapPos.x -= heightMap.GetWidth(); }
+	while (currentMapPos.y < 0.0f) { currentMapPos.y += heightMap.GetHeight(); }
+	while (currentMapPos.y >= heightMap.GetHeight()) { currentMapPos.y -= heightMap.GetHeight(); }
+
+	const int rawHeight = heightMap.GetPixel((int)currentMapPos.x, (int)currentMapPos.y).GetR();
+
+	if (pCam->height < rawHeight) {
+		pCam->target_height = (float)rawHeight;
+		pCam->height = (float)rawHeight;
+	}
+}
+
 Vec2 GetRotated90Clockwise(Vec2 vector) {
 	return { vector.y, -vector.x };
 }
@@ -29,8 +46,8 @@ void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx)
 	const Vec2 deltaX = (rPoint - lPoint) / (float)wResolution;
 
 	for (int i = 0; i < wResolution; i++) {
-		Vec2 target = lPoint + deltaX * (float)i;
-		Vec2 deltaY = (target - cam.pos) / cam.zfar;
+		const Vec2 target = lPoint + deltaX * (float)i;
+		const Vec2 deltaY = (target - cam.pos) / cam.zfar;
 
 		int maxHeight = Graphics::ScreenHeight - 1;
 		for (int z = 1; z < cam.zfar; z++) {
@@ -41,7 +58,7 @@ void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx)
 			while (currentMapPos.y < 0.0f) { currentMapPos.y += heightMap.GetHeight(); }
 			while (currentMapPos.y >= heightMap.GetHeight()) { currentMapPos.y -= heightMap.GetHeight(); }
 
-			int rawHeight = heightMap.GetPixel((int)currentMapPos.x, (int)currentMapPos.y).GetR();
+			const int rawHeight = heightMap.GetPixel((int)currentMapPos.x, (int)currentMapPos.y).GetR();
 			int heightOnScreen = int((cam.height - rawHeight) * scaleFactor / z + cam.pitch);
 
 			if (heightOnScreen < 0) { heightOnScreen = 0; }
