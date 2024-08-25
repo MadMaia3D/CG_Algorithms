@@ -17,7 +17,7 @@ void CameraMoveBackward(Camera *pCam, float speed, float deltaTime) {
 }
 
 void CameraStrafeLeft(Camera *pCam, float speed, float deltaTime) {
-	const Vec2 cameraDirection = Vec2(1.0f, 0.0f).Rotated(pCam->angle);
+	const Vec2 cameraDirection = Vec2::RIGHT.Rotated(pCam->angle);
 	const Vec2 cameraLeft = cameraDirection.Rotated90Clockwise();
 	pCam->target_pos += cameraLeft * speed * deltaTime;
 }

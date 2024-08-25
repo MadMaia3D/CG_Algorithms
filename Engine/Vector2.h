@@ -110,8 +110,25 @@ public:
 public:
 	T x;
 	T y;
+public:
+	static const Vector2 ZERO;
+	static const Vector2 LEFT;
+	static const Vector2 RIGHT;
+	static const Vector2 UP;
+	static const Vector2 DOWN;
 };
 
 typedef Vector2<float> Vec2;
 typedef Vector2<double> Ved2;
 typedef Vector2<int> Vei2;
+
+template<typename T>
+const Vector2<T> Vector2<T>::ZERO = { (T)0, (T)0 };
+template<typename T>
+const Vector2<T> Vector2<T>::LEFT = { (T)-1, (T)0 };
+template<typename T>
+const Vector2<T> Vector2<T>::RIGHT = { (T)1, (T)0 };
+template<typename T>
+const Vector2<T> Vector2<T>::UP = { (T)0, (T)-1 };
+template<typename T>
+const Vector2<T> Vector2<T>::DOWN = { (T)0, (T)1 };
