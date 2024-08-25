@@ -101,6 +101,12 @@ public:
 		const float cosTheta = cos(radians);
 		return { cosTheta * x - sinTheta * y, sinTheta * x + cosTheta * y };
 	}
+	Vector2 Rotated90Clockwise() const {
+		return { y, -x };
+	}
+	Vector2 Rotated90CounterClockwise() const {
+		return -Rotated90Clockwise();
+	}
 public:
 	T x;
 	T y;
