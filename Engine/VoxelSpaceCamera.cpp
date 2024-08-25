@@ -7,6 +7,15 @@ void UpdateCamera(Camera * pCam, float deltaTime) {
 	pCam->pitch = Interpolate(pCam->pitch, pCam->target_pitch, 1.0f - exp(-deltaTime * pCam->pitch_acceleration));
 }
 
+void CameraMoveForward(Camera *pCam, float speed, float deltaTime) {
+	pCam->target_pos.x += cos(pCam->angle) * speed * deltaTime;
+	pCam->target_pos.y += sin(pCam->angle) * speed * deltaTime;
+}
+
+void CameraMoveBackward(Camera *pCam, float speed, float deltaTime) {
+	CameraMoveForward(pCam, -speed, deltaTime);
+}
+
 void CameraStrafeLeft(Camera *pCam, float speed, float deltaTime) {
 	const Vec2 cameraDirection = Vec2(1.0f, 0.0f).Rotated(pCam->angle);
 	const Vec2 cameraLeft = cameraDirection.Rotated90Clockwise();

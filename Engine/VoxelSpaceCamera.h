@@ -22,5 +22,7 @@ struct Camera {
 };
 
 void UpdateCamera(Camera *pCam, float deltaTime);
+void CameraMoveForward(Camera *pCam, float speed, float deltaTime);
+void CameraMoveBackward(Camera *pCam, float speed, float deltaTime);
 void CameraStrafeLeft(Camera *pCam, float speed, float deltaTime);
 void CameraStrafeRight(Camera *pCam, float speed, float deltaTime);
