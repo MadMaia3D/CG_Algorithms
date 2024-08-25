@@ -25,6 +25,7 @@
 #include "Graphics.h"
 #include "VoxelSpace.h"
 #include "Timer.h"
+#include "MouseTracker.h"
 
 class Game
 {
@@ -48,6 +49,7 @@ private:
 	const Surface cMap;
 	MapData mapData;
 	Camera cam = { { 512, 512 }};
+	MouseTracker mouseTracker;
 	Timer timer;
 	/********************************/
 };

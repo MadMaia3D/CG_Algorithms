@@ -46,25 +46,33 @@ void Game::UpdateModel() {
 	constexpr float liftSpeed = 120.0f;
 	constexpr float pitchSpeed = 500.0f;
 
+	while (!wnd.mouse.IsEmpty()) {
+		Mouse::Event e = wnd.mouse.Read();
+
+		switch (e.GetType()) {
+		case Mouse::Event::Type::LPress:
+			mouseTracker.StartTracking(wnd.mouse.GetPosVec2());
+			break;
+		case Mouse::Event::Type::LRelease:
+			mouseTracker.StopTracking();
+			break;
+		}
+	}
+	const Vec2 trackedMouseMove = mouseTracker.Track(wnd.mouse.GetPosVec2());
+	cam.target_angle -= trackedMouseMove.x / gfx.ScreenWidth * cam.FOV;
+	cam.target_pitch += trackedMouseMove.y;
+
 	if (wnd.kbd.KeyIsPressed('W')) {
-		cam.target_pos.x += cos(cam.angle) * moveSpeed * deltaTime;
-		cam.target_pos.y += sin(cam.angle) * moveSpeed * deltaTime;
+		CameraMoveForward(&cam, moveSpeed, deltaTime);
 	}
 	if (wnd.kbd.KeyIsPressed('S')) {
-		cam.target_pos.x -= cos(cam.angle) * moveSpeed * deltaTime;
-		cam.target_pos.y -= sin(cam.angle) * moveSpeed * deltaTime;
+		CameraMoveBackward(&cam, moveSpeed, deltaTime);
 	}
 	if (wnd.kbd.KeyIsPressed('A')) {
-		cam.target_angle -= rotationSpeed * deltaTime;
+		CameraStrafeLeft(&cam, moveSpeed, deltaTime);
 	}
 	if (wnd.kbd.KeyIsPressed('D')) {
-		cam.target_angle += rotationSpeed * deltaTime;
-	}
-	if (wnd.kbd.KeyIsPressed('Q')) {
-		cam.target_pitch -= pitchSpeed * deltaTime;
-	}
-	if (wnd.kbd.KeyIsPressed('E')) {
-		cam.target_pitch += pitchSpeed * deltaTime;
+		CameraStrafeRight(&cam, moveSpeed, deltaTime);
 	}
 	if (wnd.kbd.KeyIsPressed(VK_CONTROL)) {
 		cam.target_height -= liftSpeed * deltaTime;
