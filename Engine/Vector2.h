@@ -96,6 +96,11 @@ public:
 	bool	operator!=(const Vector2 &rhs) const {
 		return !(*this == rhs);
 	}
+	Vector2 Rotated(float radians) const {
+		const float sinTheta = sin(radians);
+		const float cosTheta = cos(radians);
+		return { cosTheta * x - sinTheta * y, sinTheta * x + cosTheta * y };
+	}
 public:
 	T x;
 	T y;
