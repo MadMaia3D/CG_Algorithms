@@ -1,12 +1,5 @@
 #include "VoxelSpace.h"
 
-void UpdateCamera(Camera * pCam, float deltaTime) {
-	pCam->pos = Interpolate(pCam->pos, pCam->target_pos, 1.0f - exp(-deltaTime * pCam->position_acceleration));
-	pCam->height = Interpolate(pCam->height, pCam->target_height, 1.0f - exp(-deltaTime * pCam->height_acceleration));
-	pCam->angle = Interpolate(pCam->angle, pCam->target_angle, 1.0f - exp(-deltaTime * pCam->angle_acceleration));
-	pCam->pitch = Interpolate(pCam->pitch, pCam->target_pitch, 1.0f - exp(-deltaTime * pCam->pitch_acceleration));
-}
-
 void PreventUndergroundCamera(Camera * pCam, MapData * pMapData) {
 	Vec2 currentMapPos = pCam->pos;
 	const Surface &heightMap = *pMapData->pHeightMap;
@@ -26,6 +19,10 @@ void PreventUndergroundCamera(Camera * pCam, MapData * pMapData) {
 
 Vec2 GetRotated90Clockwise(Vec2 vector) {
 	return { vector.y, -vector.x };
+}
+
+Vec2 GetRotated90CounterClockwise(Vec2 vector) {
+	return GetRotated90Clockwise(-vector);
 }
 
 void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx) {

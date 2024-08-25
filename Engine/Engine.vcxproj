@@ -162,6 +162,7 @@
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="VoxelSpace.h" />
+    <ClInclude Include="VoxelSpaceCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="COMInitializer.cpp" />
@@ -176,6 +177,7 @@
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Surface.cpp" />
     <ClCompile Include="VoxelSpace.cpp" />
+    <ClCompile Include="VoxelSpaceCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="FramebufferPS.hlsl">
