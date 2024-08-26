@@ -85,10 +85,11 @@ void Game::UpdateModel() {
 }
 
 void Game::ComposeFrame() {
+	constexpr Color skyColor(128, 200, 255);
 	for (int y = 0; y < Graphics::ScreenHeight; y++) {
 		for (int x = 0; x < Graphics::ScreenWidth; x++) {
-			gfx.PutPixel(x, y, {128,200,255});
+			gfx.PutPixel(x, y, skyColor);
 		}
 	}
-	RenderVoxelMap(&mapData, &cam, gfx);
+	RenderVoxelMap(&mapData, &cam, gfx, Vec3(skyColor));
 }

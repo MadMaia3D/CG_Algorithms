@@ -1,5 +1,6 @@
 #pragma once
 #include "Graphics.h"
+#include "Vector3.h"
 #include "VoxelSpaceCamera.h"
 
 struct MapData {
@@ -24,4 +25,4 @@ bool IsBetween(T value, T lowerLimit, T upperLimit, int options = EXCLUSIVE_LOWE
 void PreventUndergroundCamera(Camera *pCam, MapData *pMap);
 
 Vec2 GetRotated90Clockwise(Vec2 vector);
-void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx);
+void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx, const Vec3 fogColor = { 0.0f, 0.0f, 0.0f });
