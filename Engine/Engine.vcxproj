@@ -161,6 +161,7 @@
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vector2.h" />
+    <ClInclude Include="Vector3.h" />
     <ClInclude Include="VoxelSpace.h" />
     <ClInclude Include="VoxelSpaceCamera.h" />
   </ItemGroup>
