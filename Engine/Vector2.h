@@ -41,6 +41,12 @@ public:
 	T  Len() const {
 		return sqrt(LenSq());
 	}
+	T DistanceToSqr(const Vector2 other) const {
+		return Vector2(other - *this).LenSq();
+	}
+	T DistanceTo(const Vector2 other) const {
+		return sqrt(DistanceToSqr(other));
+	}
 	Vector2& Normalize() {
 		const T length = Len();
 		x /= length;
