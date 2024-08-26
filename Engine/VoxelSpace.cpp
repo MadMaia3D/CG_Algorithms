@@ -30,7 +30,7 @@ void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx,
 	const Surface &colorMap = *pMapData->pColorMap;
 	const Camera &cam = *pCam;
 	const int wResolution = gfx.ScreenWidth;
-	constexpr float scaleFactor = 500.0f;
+	constexpr float terrainHeightFactor = 400.0f;
 
 	// calculate camera front and right vectors
 	const Vec2 cameraFront = Vec2(cos(cam.angle), sin(cam.angle));
@@ -57,7 +57,8 @@ void RenderVoxelMap(const MapData *pMapData, const Camera *pCam, Graphics & gfx,
 			while (currentMapPosWrapped.y >= heightMap.GetHeight()) { currentMapPosWrapped.y -= heightMap.GetHeight(); }
 
 			const int rawHeight = heightMap.GetPixel((int)currentMapPosWrapped.x, (int)currentMapPosWrapped.y).GetR();
-			int heightOnScreen = int((cam.height - rawHeight) * scaleFactor / z + cam.pitch);
+			// this is the "magic" formula for the algorithm
+			int heightOnScreen = int((cam.height - rawHeight) * terrainHeightFactor / z + cam.pitch);
 
 			if (heightOnScreen < 0) { heightOnScreen = 0; }
 			if (heightOnScreen >= Graphics::ScreenHeight) { heightOnScreen = Graphics::ScreenHeight - 1; }
